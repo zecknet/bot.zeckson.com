@@ -3,8 +3,9 @@ import { Composer, InlineKeyboard } from "grammy"
 const demo = new Composer()
 
 const keyboard = InlineKeyboard.from([[
-    InlineKeyboard.url('❤️', 'https://zeckson.com'),
+    InlineKeyboard.url('❤️', 'https://vernam.zeckson.com'),
     InlineKeyboard.text('Delete', 'delete'),
+    InlineKeyboard.webApp(`Open in browser`, `https://vernam.zeckson.com`)
 ]])
 
 demo.command(`start`, (ctx) => ctx.reply('Hello'))
