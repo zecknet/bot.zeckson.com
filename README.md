@@ -1,5 +1,5 @@
-# Finance bot
-Finance bot to handle finance inquiries
+# bot.zeckson.com
+My personal bot to handle personal inquiries.
 
 # Working with the project
 1. To install dependencies use:
