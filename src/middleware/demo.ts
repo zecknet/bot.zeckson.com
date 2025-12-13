@@ -5,7 +5,8 @@ const demo = new Composer()
 const keyboard = InlineKeyboard.from([[
     InlineKeyboard.url('❤️', 'https://vernam.zeckson.com'),
     InlineKeyboard.text('Delete', 'delete'),
-    InlineKeyboard.webApp(`Open in browser`, `https://vernam.zeckson.com`)
+    InlineKeyboard.webApp(`Open in browser`, `https://vernam.zeckson.com`),
+    InlineKeyboard.webApp(`Open in browser (data)`, `https://vernam.zeckson.com?data=${Date.now()}`)
 ]])
 
 demo.command(`start`, (ctx) => ctx.reply('Hello'))
