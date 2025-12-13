@@ -23,7 +23,8 @@ demo.on(
         const match = messageText.match(URL_PATTERN)
         if (!match) return
 
-        await ctx.copyMessage(ctx.message.chat.id, { reply_markup: keyboard(ctx.message) })
+        const url = match[0]
+        await ctx.reply(messageText, { reply_markup: keyboard(url) })
     }
 )
 demo.callbackQuery('delete', (ctx) => ctx.deleteMessage())
