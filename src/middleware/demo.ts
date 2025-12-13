@@ -1,12 +1,14 @@
 import { Composer, InlineKeyboard } from "grammy"
 
+const URL_PATTERN = /https?:\/\/[^\s]+/
+
 const demo = new Composer()
 
-const keyboard = InlineKeyboard.from([[
+const keyboard = (data: string) => InlineKeyboard.from([[
     InlineKeyboard.url('❤️', 'https://vernam.zeckson.com'),
     InlineKeyboard.text('Delete', 'delete'),
     InlineKeyboard.webApp(`Open in browser`, `https://vernam.zeckson.com`),
-    InlineKeyboard.webApp(`Open in browser (data)`, `https://vernam.zeckson.com?data=${Date.now()}`)
+    InlineKeyboard.webApp(`Open in browser (data)`, `https://vernam.zeckson.com?data=${data}`)
 ]])
 
 demo.command(`start`, (ctx) => ctx.reply('Hello'))
@@ -14,7 +16,15 @@ demo.command(`start`, (ctx) => ctx.reply('Hello'))
 demo.command(`help`, (ctx) => ctx.reply('Help message'))
 demo.on(
     'message',
-    (ctx) => ctx.copyMessage(ctx.message.chat.id, { reply_markup: keyboard }),
+    async (ctx) => {
+        const messageText = ctx.message.text
+        if (!messageText) return
+
+        const match = messageText.match(URL_PATTERN)
+        if (!match) return
+
+        await ctx.copyMessage(ctx.message.chat.id, { reply_markup: keyboard(ctx.message) })
+    }
 )
 demo.callbackQuery('delete', (ctx) => ctx.deleteMessage())
 
