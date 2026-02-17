@@ -1,10 +1,18 @@
 import { Composer } from 'grammy'
 
-const { REPLICATE_API_TOKEN } = Deno.env.toObject()
+const { REPLICATE_API_TOKEN, APPROVED_USER_IDS } = Deno.env.toObject()
+
+const approvedIds = APPROVED_USER_IDS ? APPROVED_USER_IDS.split(',').map(id => id.trim()) : []
 
 const replicate = new Composer()
 
 replicate.command('bot', async (ctx) => {
+	const userId = ctx.from?.id.toString()
+	if (!userId || !approvedIds.includes(userId)) {
+		console.log(`Unauthorized access attempt by user: ${userId}`)
+		return
+	}
+
 	const prompt = ctx.match
 	if (!prompt) {
 		await ctx.reply('Please provide a prompt, e.g. /bot Hello')
