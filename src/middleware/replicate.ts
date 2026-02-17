@@ -1,17 +1,9 @@
 import { Composer } from 'grammy'
 import { config } from '../config.ts'
 
-const approvedIds = config.ADMIN_USER_IDS
-
 const replicate = new Composer()
 
 replicate.command('bot', async (ctx) => {
-	const userId = ctx.from?.id.toString()
-	if (!userId || !approvedIds.includes(userId)) {
-		console.log(`Unauthorized access attempt by user: ${userId}`)
-		return
-	}
-
 	const prompt = ctx.match
 	if (!prompt) {
 		await ctx.reply('Please provide a prompt, e.g. /bot Hello')
