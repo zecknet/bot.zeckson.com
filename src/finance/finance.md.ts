@@ -6,6 +6,9 @@ import { rupees } from '../formatters/rupiee.ts'
 import { usdt } from '../formatters/usdt.ts'
 
 export class Markdown {
+	static rate(given: Currency, received: Currency): string {
+		return rate(exchangeRate(given, received))
+	}
 	static roubles2usdt(given: Currency, received: Currency): string {
 		const result = exchangeRate(given, received)
 		return `Поменял: ${roubles(given)} (${usdt(received)}). Курс: **${
