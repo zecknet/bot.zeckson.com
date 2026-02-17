@@ -1,10 +1,9 @@
 import { handleWebhook, setWebhook } from './server.deno.ts'
 import { bot } from './src/bot.ts'
+import { config } from "./src/config.ts"
 
-const PROJECT_ID = `zeckson-finance-bot`
-const DEPLOYMENT_ID = Deno.env.get(`DENO_DEPLOYMENT_ID`)
-const DEPLOY_URL = `https://${PROJECT_ID}${
-	DEPLOYMENT_ID ? `-${DEPLOYMENT_ID}` : ``
+const DEPLOY_URL = `https://${config.PROJECT_ID}${
+	config.DENO_DEPLOYMENT_ID ? `-${config.DENO_DEPLOYMENT_ID}` : ``
 }.deno.dev`
 
 const hello = (req: Request) =>

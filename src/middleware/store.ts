@@ -1,10 +1,9 @@
 import { Context } from "grammy"
 import { DenoStore } from "../store/denostore.ts"
-
-const DENO_KV_URL = Deno.env.get("DENO_KV_URL")
+import { config } from "../config.ts"
 
 const openStore = () => {
-    if (DENO_KV_URL) return Deno.openKv(DENO_KV_URL)
+    if (config.DENO_KV_URL) return Deno.openKv(config.DENO_KV_URL)
     else return Deno.openKv()
 }
 const store = new DenoStore(await openStore())

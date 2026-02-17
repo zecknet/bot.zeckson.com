@@ -1,5 +1,4 @@
-import '@std/dotenv/load'
-
+import { config } from "./src/config.ts"
 import { bot } from './src/bot.ts'
 
 // Learn more at https://docs.deno.com/runtime/manual/examples/module_metadata#concepts

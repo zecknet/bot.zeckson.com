@@ -1,8 +1,7 @@
 import { Composer } from 'grammy'
+import { config } from '../config.ts'
 
-const { REPLICATE_API_TOKEN, APPROVED_USER_IDS } = Deno.env.toObject()
-
-const approvedIds = APPROVED_USER_IDS ? APPROVED_USER_IDS.split(',').map(id => id.trim()) : []
+const approvedIds = config.ADMIN_USER_IDS
 
 const replicate = new Composer()
 
@@ -19,7 +18,7 @@ replicate.command('bot', async (ctx) => {
 		return
 	}
 
-	if (!REPLICATE_API_TOKEN) {
+	if (!config.REPLICATE_API_TOKEN) {
 		await ctx.reply('Replicate API token is not configured.')
 		return
 	}
@@ -37,7 +36,7 @@ replicate.command('bot', async (ctx) => {
 			{
 				method: 'POST',
 				headers: {
-					Authorization: `Token ${REPLICATE_API_TOKEN}`,
+					Authorization: `Token ${config.REPLICATE_API_TOKEN}`,
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
@@ -69,7 +68,7 @@ replicate.command('bot', async (ctx) => {
 			await new Promise((resolve) => setTimeout(resolve, 1000))
 			const pollResponse = await fetch(prediction.urls.get, {
 				headers: {
-					Authorization: `Token ${REPLICATE_API_TOKEN}`,
+					Authorization: `Token ${config.REPLICATE_API_TOKEN}`,
 				},
 			})
 			prediction = await pollResponse.json()
