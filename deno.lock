@@ -4,7 +4,7 @@
     "jsr:@std/assert@1.0.18": "1.0.18",
     "jsr:@std/dotenv@0.225.6": "0.225.6",
     "jsr:@std/internal@^1.0.12": "1.0.12",
-    "npm:@grammyjs/parse-mode@1.10.0": "1.10.0_grammy@1.40.0",
+    "npm:@grammyjs/parse-mode@2.2.1": "2.2.1_grammy@1.40.0",
     "npm:grammy@1.40.0": "1.40.0"
   },
   "jsr": {
@@ -22,8 +22,8 @@
     }
   },
   "npm": {
-    "@grammyjs/parse-mode@1.10.0_grammy@1.40.0": {
-      "integrity": "sha512-ZjbY2Ax0b4Nf8lPz3NV0cWDxUC10kOkzgxws+iTdgG+hAiPQVUnP/oJnAKrW1ZQOWULZYQ4GOR/+aCZHyUuLQA==",
+    "@grammyjs/parse-mode@2.2.1_grammy@1.40.0": {
+      "integrity": "sha512-nD1Cz/vltpbTHX+8sbDEiM5pfSxOTGlwo2bnnPKByuscLFofo7lUTjR1N7h3E9LA72lniIsrvPpCOzOquMHvTw==",
       "dependencies": [
         "grammy"
       ]
@@ -82,7 +82,7 @@
     "dependencies": [
       "jsr:@std/assert@1.0.18",
       "jsr:@std/dotenv@0.225.6",
-      "npm:@grammyjs/parse-mode@1.10.0",
+      "npm:@grammyjs/parse-mode@2.2.1",
       "npm:grammy@1.40.0"
     ]
   }
