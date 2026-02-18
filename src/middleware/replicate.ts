@@ -12,14 +12,6 @@ replicate.on('business_message', (ctx, next) => {
 	const message = ctx.businessMessage
 	const msg = message?.text
 
-	if (message.from.id !== Number(config.ROOT_USER_ID)) {
-		console.log(`Ignoring message from non-ROOT_USER_ID: ${message.from.id}`)
-		ctx.reply('Господин запретил мне общаться с простолюдинами', {
-			business_connection_id: businessConnectionId,
-		})
-		return next()
-	}
-
 	if (msg && msg.startsWith('/bot ')) {
 		ctx.match = msg.replace('/bot ', '')
 		return executeBotCommand(ctx)
@@ -36,6 +28,11 @@ const executeBotCommand = async (ctx: Context) => {
 		console.log(
 			`Running /bot command under ROOT_USER_ID. Ignoring business connection ID: ${businessConnectionId}`,
 		)
+	} else {
+		ctx.reply('Господин запретил мне общаться с простолюдинами', {
+			business_connection_id: businessConnectionId,
+		})
+		return
 	}
 
 	if (!prompt) {
