@@ -77,9 +77,22 @@ const executeBotCommand = async (ctx: Context) => {
 		await ctx.reply(result as string, {
 			business_connection_id: businessConnectionId,
 		})
-	} catch (error) {
+	} catch (error: any) {
 		console.error('Error in /bot command:', error)
-		await ctx.reply('An error occurred while processing your request.', {
+
+		let errorMessage = 'An error occurred while processing your request.'
+
+		if (error.status === 429) {
+			const retryAfter = error.retry_after || 0
+			errorMessage =
+				`⚠️ Replicate rate limit exceeded. Please try again later${
+					retryAfter ? ` (in ~${retryAfter}s)` : ''
+				}.`
+		} else if (error.status) {
+			errorMessage = `⚠️ Replicate API returned error ${error.status}.`
+		}
+
+		await ctx.reply(errorMessage, {
 			business_connection_id: businessConnectionId,
 		})
 	}
