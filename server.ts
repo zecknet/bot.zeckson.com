@@ -1,6 +1,6 @@
 import { handleWebhook, setWebhook } from './server.deno.ts'
 import { bot } from './src/bot.ts'
-import { config } from "./src/config.ts"
+import { config } from './src/config.ts'
 
 const DEPLOY_URL = `https://${config.PROJECT_ID}${
 	config.DENO_DEPLOYMENT_ID ? `-${config.DENO_DEPLOYMENT_ID}` : ``

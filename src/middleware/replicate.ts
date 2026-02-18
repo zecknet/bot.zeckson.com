@@ -45,16 +45,16 @@ replicate.command('bot', async (ctx) => {
 			prompt: prompt,
 			videos: [],
 			temperature: 1,
-			thinking_level: "low",
-			max_output_tokens: 65535
-		};
+			thinking_level: 'low',
+			max_output_tokens: 65535,
+		}
 
 		const output = await client.run(
-			"google/gemini-3-pro",
+			'google/gemini-3-pro',
 			{
 				input: input,
-			}
-		);
+			},
+		)
 		// Using a popular model like meta/meta-llama-3-70b-instruct
 		const result = Array.isArray(output) ? output.join('') : output
 		await ctx.reply(result as string, {
