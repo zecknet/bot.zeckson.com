@@ -9,13 +9,12 @@ const client = new Replicate({
 })
 
 replicate.command('bot', async (ctx) => {
-	let prompt = ctx.match
-	let businessConnectionId = ctx.businessConnectionId
+	const prompt = ctx.match
+	const businessConnectionId = ctx.businessConnectionId
 
 	if (ctx.from?.id === Number(config.ROOT_USER_ID)) {
-		businessConnectionId = undefined
 		console.log(
-			'Running /bot command in test mode (ignoring businessConnectionId)',
+			`Running /bot command under ROOT_USER_ID. Ignoring business connection ID: ${businessConnectionId}`,
 		)
 	}
 

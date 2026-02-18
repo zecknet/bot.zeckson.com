@@ -1,4 +1,4 @@
-import { blockquote, bold, code, fmt, FormattedString, mentionUser } from "@grammyjs/parse-mode";
+import { fmt, FormattedString } from "@grammyjs/parse-mode";
 import { Context, NextFunction } from "grammy";
 import { config } from "../config.ts";
 

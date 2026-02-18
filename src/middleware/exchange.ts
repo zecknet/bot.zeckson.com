@@ -1,5 +1,5 @@
 import { Composer, Context } from "grammy"
-import { fmt, bold, FormattedString } from "@grammyjs/parse-mode"
+import { fmt, FormattedString } from "@grammyjs/parse-mode"
 import { Markdown } from "../finance/finance.md.ts"
 
 const split = (ctx: Context) => ctx.message?.text?.split(` `) ?? []
