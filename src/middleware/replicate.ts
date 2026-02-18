@@ -1,4 +1,4 @@
-import { Composer } from 'grammy'
+import { Context, Composer } from 'grammy'
 import Replicate from 'replicate'
 import { config } from '../config.ts'
 
@@ -9,9 +9,9 @@ const client = new Replicate({
 })
 
 replicate.on('business_message', (ctx, next) => {
-	const msg = ctx.businessMessage()?.text
+	const msg = ctx.businessMessage?.text
 
-	if (msg.startsWith('/bot ')) {
+	if (msg && msg.startsWith('/bot ')) {
 		ctx.match = msg.replace('/bot ', '')
 		return executeBotCommand(ctx)
 	}
@@ -19,7 +19,7 @@ replicate.on('business_message', (ctx, next) => {
 	return next()
 })
 
-const executeBotCommand = async (ctx) => {
+const executeBotCommand = async (ctx: Context) => {
 	const prompt = ctx.match
 	const businessConnectionId = ctx.businessConnectionId
 

@@ -17,7 +17,7 @@ export const auth = async (
 
     console.log(`Unauthorized access attempt by user: ${userId}`);
 
-    const messageText = (ctx.message() || ctx.businessMessage)?.text || ctx.callbackQuery?.data ||
+    const messageText = (ctx.message || ctx.businessMessage)?.text || ctx.callbackQuery?.data ||
         "unknown interaction";
 
     if (config.ROOT_USER_ID) {
