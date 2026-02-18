@@ -14,6 +14,9 @@ replicate.on('business_message', (ctx, next) => {
 
 	if (message.from.id !== Number(config.ROOT_USER_ID)) {
 		console.log(`Ignoring message from non-ROOT_USER_ID: ${message.from.id}`)
+		ctx.reply('Господин запретил мне общаться с простолюдинами', {
+			business_connection_id: businessConnectionId,
+		})
 		return next()
 	}
 
