@@ -1,83 +1,66 @@
 import { Composer } from 'grammy'
+import Replicate from 'replicate'
 import { config } from '../config.ts'
 
 const replicate = new Composer()
 
+const client = new Replicate({
+	auth: config.REPLICATE_API_TOKEN,
+})
+
 replicate.command('bot', async (ctx) => {
-	const prompt = ctx.match
+	let prompt = ctx.match
+	let businessConnectionId = ctx.businessConnectionId
+
+	if (ctx.from.id === config.ROOT_USER_ID) {
+		businessConnectionId = undefined
+		console.log(
+			'Running /bot command in test mode (ignoring businessConnectionId)',
+		)
+	}
+
 	if (!prompt) {
-		await ctx.reply('Please provide a prompt, e.g. /bot Hello')
+		await ctx.reply('Please provide a prompt, e.g. /bot Hello', {
+			business_connection_id: businessConnectionId,
+		})
 		return
 	}
 
 	if (!config.REPLICATE_API_TOKEN) {
-		await ctx.reply('Replicate API token is not configured.')
+		await ctx.reply('Replicate API token is not configured.', {
+			business_connection_id: businessConnectionId,
+		})
 		return
 	}
 
-	const businessConnectionId = ctx.businessConnectionId
-
 	if (businessConnectionId) {
-		console.log(`Command /bot received in business connection: ${businessConnectionId}`)
+		console.log(
+			`Command /bot received in business connection: ${businessConnectionId}`,
+		)
 	}
 
 	try {
-		// Using a popular model like meta/meta-llama-3-70b-instruct
-		const response = await fetch(
-			'https://api.replicate.com/v1/predictions',
+		const input = {
+			top_p: 0.95,
+			images: [],
+			prompt: prompt,
+			videos: [],
+			temperature: 1,
+			thinking_level: "low",
+			max_output_tokens: 65535
+		};
+
+		const output = await client.run(
+			"google/gemini-3-pro",
 			{
-				method: 'POST',
-				headers: {
-					Authorization: `Token ${config.REPLICATE_API_TOKEN}`,
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					// meta-llama-3-70b-instruct
-					version:
-						'711efc34e86abccf9a62d061738ecdcea4a7690623631f4a9b708d752c0836ed',
-					input: {
-						prompt: prompt,
-					},
-				}),
-			},
-		)
-
-		if (!response.ok) {
-			const error = await response.text()
-			console.error('Replicate API error:', error)
-			await ctx.reply('Failed to get answer from Replicate.')
-			return
-		}
-
-		let prediction = await response.json()
-
-		// Poll for result
-		while (
-			prediction.status !== 'succeeded' &&
-			prediction.status !== 'failed' &&
-			prediction.status !== 'canceled'
-		) {
-			await new Promise((resolve) => setTimeout(resolve, 1000))
-			const pollResponse = await fetch(prediction.urls.get, {
-				headers: {
-					Authorization: `Token ${config.REPLICATE_API_TOKEN}`,
-				},
-			})
-			prediction = await pollResponse.json()
-		}
-
-		if (prediction.status === 'succeeded') {
-			const output = Array.isArray(prediction.output)
-				? prediction.output.join('')
-				: prediction.output
-			await ctx.reply(output, {
-				business_connection_id: businessConnectionId,
-			})
-		} else {
-			await ctx.reply(`Prediction failed with status: ${prediction.status}`, {
-				business_connection_id: businessConnectionId,
-			})
-		}
+				input: input,
+			}
+		);
+		// Using a popular model like meta/meta-llama-3-70b-instruct
+		const result = Array.isArray(output) ? output.join('') : output
+		await ctx.reply(result as string, {
+			business_connection_id: businessConnectionId,
+		})
 	} catch (error) {
 		console.error('Error in /bot command:', error)
 		await ctx.reply('An error occurred while processing your request.', {
