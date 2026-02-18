@@ -6,7 +6,7 @@
     "jsr:@std/internal@^1.0.12": "1.0.12",
     "npm:@grammyjs/parse-mode@2.2.1": "2.2.1_grammy@1.40.0",
     "npm:grammy@1.40.0": "1.40.0",
-    "npm:replicate@^1.0.1": "1.4.0"
+    "npm:replicate@1.0.1": "1.0.1"
   },
   "jsr": {
     "@std/assert@1.0.18": {
@@ -93,8 +93,8 @@
         "process"
       ]
     },
-    "replicate@1.4.0": {
-      "integrity": "sha512-1ufKejfUVz/azy+5TnzQP7U1+MHVWZ6psnQ06az8byUUnRhT+DZ/MvewzB1NQYBVMgNKR7xPDtTwlcP5nv/5+w==",
+    "replicate@1.0.1": {
+      "integrity": "sha512-EY+rK1YR5bKHcM9pd6WyaIbv6m2aRIvHfHDh51j/LahlHTLKemTYXF6ptif2sLa+YospupAsIoxw8Ndt5nI3vg==",
       "optionalDependencies": [
         "readable-stream"
       ]
@@ -119,7 +119,7 @@
       "jsr:@std/dotenv@0.225.6",
       "npm:@grammyjs/parse-mode@2.2.1",
       "npm:grammy@1.40.0",
-      "npm:replicate@^1.0.1"
+      "npm:replicate@1.0.1"
     ]
   }
 }
