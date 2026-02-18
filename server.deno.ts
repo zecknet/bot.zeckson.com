@@ -1,7 +1,9 @@
 import { bot } from "./src/bot.ts";
 import { webhookCallback } from "grammy";
 
-const handleUpdate = webhookCallback(bot, "std/http");
+const handleUpdate = webhookCallback(bot, "std/http", {
+  timeoutMilliseconds: 30000,
+});
 
 export const handleWebhook = async (req: Request) => {
   if (req.method == "POST") {
