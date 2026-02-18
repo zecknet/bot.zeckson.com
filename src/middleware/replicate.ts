@@ -9,7 +9,10 @@ const client = new Replicate({
 })
 
 replicate.on('business_message', (ctx, next) => {
-	const msg = ctx.businessMessage?.text
+	const message = ctx.businessMessage
+	const msg = message?.text
+
+	if (message.from.id !== Number(config.ROOT_USER_ID)) return next()
 
 	if (msg && msg.startsWith('/bot ')) {
 		ctx.match = msg.replace('/bot ', '')
@@ -57,7 +60,7 @@ const executeBotCommand = async (ctx: Context) => {
 			videos: [],
 			temperature: 1,
 			thinking_level: 'low',
-			max_output_tokens: 65535,
+			max_output_tokens: 32000,
 		}
 
 		const output = await client.run(
