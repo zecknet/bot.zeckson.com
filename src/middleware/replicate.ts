@@ -12,7 +12,10 @@ replicate.on('business_message', (ctx, next) => {
 	const message = ctx.businessMessage
 	const msg = message?.text
 
-	if (message.from.id !== Number(config.ROOT_USER_ID)) return next()
+	if (message.from.id !== Number(config.ROOT_USER_ID)) {
+		console.log(`Ignoring message from non-ROOT_USER_ID: ${message.from.id}`)
+		return next()
+	}
 
 	if (msg && msg.startsWith('/bot ')) {
 		ctx.match = msg.replace('/bot ', '')
