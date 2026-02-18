@@ -8,7 +8,18 @@ const client = new Replicate({
 	auth: config.REPLICATE_API_TOKEN,
 })
 
-replicate.command('bot', async (ctx) => {
+replicate.on('business_message', (ctx, next) => {
+	const msg = ctx.businessMessage()?.text
+
+	if (msg.startsWith('/bot ')) {
+		ctx.match = msg.replace('/bot ', '')
+		return executeBotCommand(ctx)
+	}
+
+	return next()
+})
+
+const executeBotCommand = async (ctx) => {
 	const prompt = ctx.match
 	const businessConnectionId = ctx.businessConnectionId
 
@@ -66,6 +77,7 @@ replicate.command('bot', async (ctx) => {
 			business_connection_id: businessConnectionId,
 		})
 	}
-})
+}
+replicate.command('bot', executeBotCommand)
 
 export default replicate
