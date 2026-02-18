@@ -12,7 +12,7 @@ replicate.command('bot', async (ctx) => {
 	let prompt = ctx.match
 	let businessConnectionId = ctx.businessConnectionId
 
-	if (ctx.from.id === config.ROOT_USER_ID) {
+	if (ctx.from?.id === Number(config.ROOT_USER_ID)) {
 		businessConnectionId = undefined
 		console.log(
 			'Running /bot command in test mode (ignoring businessConnectionId)',
