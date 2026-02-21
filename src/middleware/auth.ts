@@ -40,13 +40,12 @@ export const auth = async (
 
 		try {
 			const message = fmt`🚫 ${
-				FormattedString.bold('Unauthorized Request')
-			}
-			
-			${userInfo}
-			${FormattedString.bold('Update Type:')} ${FormattedString.code(updateType)}
-			${FormattedString.bold('Request:')}
-            ${FormattedString.blockquote(messageText)}`
+	FormattedString.bold('Unauthorized Request')
+}
+
+${userInfo}
+${FormattedString.bold('Update Type:')} ${FormattedString.code(updateType)}
+${FormattedString.bold('Request:')}${FormattedString.blockquote(messageText)}`
 			await ctx.api.sendMessage(
 				config.ROOT_USER_ID,
 				message.text,
