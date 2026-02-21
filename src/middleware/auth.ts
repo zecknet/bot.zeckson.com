@@ -15,8 +15,9 @@ export const auth = async (
 
 	if (ctx.businessConnectionId) return await next()
 
-	const updateType = Object.keys(ctx.update).find((key) => key !== 'update_id') ??
-		'unknown'
+	const updateType =
+		Object.keys(ctx.update).find((key) => key !== 'update_id') ??
+			'unknown'
 	console.log(
 		`Unauthorized access attempt by user: ${userId} (Update type: ${updateType})`,
 	)
@@ -40,8 +41,8 @@ export const auth = async (
 
 		try {
 			const message = fmt`🚫 ${
-	FormattedString.bold('Unauthorized Request')
-}
+				FormattedString.bold('Unauthorized Request')
+			}
 
 ${userInfo}
 ${FormattedString.bold('Update Type:')} ${FormattedString.code(updateType)}
