@@ -13,7 +13,7 @@ export const auth = async (
 		return await next()
 	}
 
-	if (ctx.businessMessage) return await next()
+	if (ctx.businessConnectionId) return await next()
 
 	console.log(`Unauthorized access attempt by user: ${userId}`)
 
