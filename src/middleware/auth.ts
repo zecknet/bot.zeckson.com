@@ -15,10 +15,14 @@ export const auth = async (
 
 	if (ctx.businessConnectionId) return await next()
 
-	console.log(`Unauthorized access attempt by user: ${userId}`)
+	const updateType = Object.keys(ctx.update).find((key) => key !== 'update_id') ??
+		'unknown'
+	console.log(
+		`Unauthorized access attempt by user: ${userId} (Update type: ${updateType})`,
+	)
 
-	const messageText = (ctx.message || ctx.businessMessage)?.text ||
-		ctx.callbackQuery?.data ||
+	const messageText = (ctx.message || ctx.businessMessage)?.text ??
+		ctx.callbackQuery?.data ??
 		'unknown interaction'
 
 	if (config.ROOT_USER_ID) {
@@ -37,7 +41,11 @@ export const auth = async (
 		try {
 			const message = fmt`🚫 ${
 				FormattedString.bold('Unauthorized Request')
-			}\n\n${userInfo}\n${FormattedString.bold('Request:')}\n
+			}
+			
+			${userInfo}
+			${FormattedString.bold('Update Type:')} ${FormattedString.code(updateType)}
+			${FormattedString.bold('Request:')}
             ${FormattedString.blockquote(messageText)}`
 			await ctx.api.sendMessage(
 				config.ROOT_USER_ID,
