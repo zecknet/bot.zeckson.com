@@ -21,7 +21,7 @@ export const auth = async (
 		`Unauthorized access attempt by user: ${userId} (Update type: ${updateType})`,
 	)
 
-	const messageText = (ctx.message || ctx.businessMessage)?.text ??
+	const messageText = ctx.msg ??
 		ctx.callbackQuery?.data ??
 		'unknown interaction'
 
