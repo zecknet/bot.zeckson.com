@@ -47,14 +47,15 @@ export const request = async (prompt: string) => {
 
 		let errorMessage = 'An error occurred while processing your request.'
 
-		if (error.status === 429) {
-			const retryAfter = error.retry_after || 0
+		const err = error as { status?: number; retry_after?: number }
+		if (err.status === 429) {
+			const retryAfter = err.retry_after || 0
 			errorMessage =
 				`⚠️ Replicate rate limit exceeded. Please try again later${
 					retryAfter ? ` (in ~${retryAfter}s)` : ''
 				}.`
-		} else if (error.status) {
-			errorMessage = `⚠️ Replicate API returned error ${error.status}.`
+		} else if (err.status) {
+			errorMessage = `⚠️ Replicate API returned error ${err.status}.`
 		}
 
 		return { status: 'error', errorMessage }
