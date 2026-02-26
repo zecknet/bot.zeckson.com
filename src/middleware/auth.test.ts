@@ -20,6 +20,7 @@ Deno.test('auth middleware allows admin', async () => {
 
 	await auth(ctx, async () => {
 		nextCalled = true
+		await Promise.resolve()
 	})
 	assert(nextCalled, 'next should be called for admin')
 })
@@ -44,6 +45,7 @@ Deno.test('auth middleware blocks non-admin', async () => {
 
 	await auth(ctx, async () => {
 		nextCalled = true
+		await Promise.resolve()
 	})
 	assert(!nextCalled, 'next should NOT be called for non-admin')
 })
@@ -60,6 +62,7 @@ Deno.test('auth middleware CURRENTLY allows business messages from ANYONE', asyn
 
 	await auth(ctx, async () => {
 		nextCalled = true
+		await Promise.resolve()
 	})
 	// THIS IS THE BUG WE ARE FIXING: it currently allows it
 	assert(
