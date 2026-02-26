@@ -1,10 +1,13 @@
 import { assert } from '@std/assert'
 import { Context } from 'grammy'
-import { config } from '../config.ts'
+import { initConfig } from '../config.ts'
 import { auth } from './auth.ts'
 
 // Mock config for testing
-config.ADMIN_USER_IDS = ['12345']
+initConfig({
+	ADMIN_USER_IDS: '12345',
+	BOT_TOKEN: 'test_token',
+})
 
 Deno.test('auth middleware allows admin', async () => {
 	let nextCalled = false
