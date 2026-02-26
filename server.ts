@@ -1,4 +1,4 @@
-import './src/config.prod'
+import './src/config.prod.ts'
 import { handleWebhook, setWebhook } from './server.deno.ts'
 import { bot } from './src/bot.ts'
 import { config } from './src/config.ts'

@@ -1,4 +1,4 @@
-import { initConfig } from "./config"
+import { initConfig } from './config.ts'
 
 const env = Deno.env.toObject()
 
