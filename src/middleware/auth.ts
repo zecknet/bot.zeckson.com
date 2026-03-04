@@ -22,10 +22,6 @@ export const auth = async (
 		`Unauthorized access attempt by user: ${userId} (Update type: ${updateType})`,
 	)
 
-	const messageText = ctx.msg ??
-		ctx.callbackQuery?.data ??
-		'unknown interaction'
-
 	if (config.ROOT_USER_ID) {
 		const user = ctx.from
 		const userInfo = user
@@ -34,19 +30,27 @@ export const auth = async (
 					`${user.first_name} ${user.last_name || ''}`,
 					user.id,
 				)
-			} (@${user.username || 'no_username'}) [${
+			} ${user.username ? `(@${user.username})` : ``} [${
 				FormattedString.code(user.id.toString())
 			}]`
-			: `User: unknown`
+			: fmt`User: unknown`
 
-		try {
-			const message = fmt`🚫 ${
-				FormattedString.bold('Unauthorized Request')
-			}
+		const update = ctx.update as unknown
+		const content = ctx.msg
+			? FormattedString.blockquote(ctx.msg)
+			: FormattedString.pre(
+				JSON.stringify(update, undefined, 2),
+				`json`,
+			)
+
+		const message = fmt`🚫 ${FormattedString.bold('Unauthorized Request')}
 
 ${userInfo}
 ${FormattedString.bold('Update Type:')} ${FormattedString.code(updateType)}
-${FormattedString.bold('Request:')}${FormattedString.blockquote(messageText)}`
+${FormattedString.bold('Content:')}
+${content}`
+
+		try {
 			await ctx.api.sendMessage(
 				config.ROOT_USER_ID,
 				message.text,
