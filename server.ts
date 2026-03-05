@@ -6,9 +6,10 @@ import ServerResponse from './src/server/response.ts'
 
 const DEPLOY_URL = config.BASE_URL
 
-
 const hello = (req: Request) =>
-	ServerResponse.text(`Hello World!\nRequest url: ${req.url}\nDeploy url: ${DEPLOY_URL}`)
+	ServerResponse.text(
+		`Hello World!\nRequest url: ${req.url}\nDeploy url: ${DEPLOY_URL}`,
+	)
 
 Deno.serve(async (req) => {
 	const start = Date.now()

@@ -44,7 +44,8 @@ export const initConfig = (env: Record<string, string>): Config => {
 		ADMIN_USER_IDS: adminUserIds,
 		DENO_DEPLOYMENT_ID: denoDeploymentId,
 		ROOT_USER_ID: adminUserIds[0],
-		REPLICATE_WEBHOOK_SIGNING_SECRET: env['REPLICATE_WEBHOOK_SIGNING_SECRET'],
+		REPLICATE_WEBHOOK_SIGNING_SECRET:
+			env['REPLICATE_WEBHOOK_SIGNING_SECRET'],
 		BASE_URL: `https://${DEFAULT.PROJECT_ID}${
 			denoDeploymentId ? `-${denoDeploymentId}` : ``
 		}.deno.dev`,

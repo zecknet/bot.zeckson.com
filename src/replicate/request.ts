@@ -11,13 +11,13 @@ type Response = {
 }
 
 type Options = {
-	input: object;
+	input: object
 	wait?:
-		| { mode: "block"; interval?: number; timeout?: number }
-		| { mode: "poll"; interval?: number };
-	webhook?: string;
-	webhook_events_filter?: WebhookEventType[];
-	signal?: AbortSignal;
+		| { mode: 'block'; interval?: number; timeout?: number }
+		| { mode: 'poll'; interval?: number }
+	webhook?: string
+	webhook_events_filter?: WebhookEventType[]
+	signal?: AbortSignal
 }
 
 const client = new Replicate({
@@ -36,7 +36,10 @@ const DEFAULT_OPTIONS = {
 	},
 }
 
-export const request = async (prompt: string, options: Omit<Options, 'input'> = {}) => {
+export const request = async (
+	prompt: string,
+	options: Omit<Options, 'input'> = {},
+) => {
 	const _options = {
 		...DEFAULT_OPTIONS,
 		...options,
