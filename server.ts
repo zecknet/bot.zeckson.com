@@ -2,18 +2,15 @@ import './src/config.prod.ts'
 import { handleWebhook, setWebhook } from './server.deno.ts'
 import { bot } from './src/bot.ts'
 import { config } from './src/config.ts'
+import ServerResponse from './src/server/response.ts'
 
 const DEPLOY_URL = `https://${config.PROJECT_ID}${
 	config.DENO_DEPLOYMENT_ID ? `-${config.DENO_DEPLOYMENT_ID}` : ``
 }.deno.dev`
 
+
 const hello = (req: Request) =>
-	new Response(
-		`Hello World!\nRequest url: ${req.url}\nDeploy url: ${DEPLOY_URL}`,
-		{
-			headers: { 'content-type': 'text/plain' },
-		},
-	)
+	ServerResponse.text(`Hello World!\nRequest url: ${req.url}\nDeploy url: ${DEPLOY_URL}`)
 
 Deno.serve(async (req) => {
 	const start = Date.now()
