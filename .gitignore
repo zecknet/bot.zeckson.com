@@ -8,3 +8,5 @@
 # https://docs.deno.com/runtime/fundamentals/modules/#vendoring-remote-modules
 vendor
 node_modules
+
+.output.txt
