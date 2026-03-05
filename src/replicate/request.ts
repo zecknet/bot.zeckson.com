@@ -1,4 +1,5 @@
 import Replicate from 'replicate'
+import type { WebhookEventType } from 'replicate'
 import { config } from '../config.ts'
 
 type Response = {
@@ -7,6 +8,16 @@ type Response = {
 } | {
 	status: 'error'
 	errorMessage: string
+}
+
+type Options = {
+	input: object;
+	wait?:
+		| { mode: "block"; interval?: number; timeout?: number }
+		| { mode: "poll"; interval?: number };
+	webhook?: string;
+	webhook_events_filter?: WebhookEventType[];
+	signal?: AbortSignal;
 }
 
 const client = new Replicate({
@@ -25,19 +36,22 @@ const DEFAULT_OPTIONS = {
 	},
 }
 
-export const request = async (prompt: string) => {
-	const options = {
+export const request = async (prompt: string, options: Omit<Options, 'input'> = {}) => {
+	const _options = {
 		...DEFAULT_OPTIONS,
+		...options,
 		input: { ...DEFAULT_OPTIONS.input, prompt },
-	}
+	} as Options
 
-	console.log('Replicate request:', options)
+	console.log('Replicate request:', _options)
 
 	try {
 		const output = await client.run(
 			DEFAULT_MODEL,
-			options,
+			_options,
 		)
+
+		console.log('Replicate response:', output)
 
 		const result = Array.isArray(output) ? output.join('') : output
 
