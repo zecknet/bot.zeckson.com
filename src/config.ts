@@ -6,6 +6,7 @@ export interface Config {
 	readonly DENO_DEPLOYMENT_ID?: string
 	readonly PROJECT_ID: string
 	readonly ROOT_USER_ID: string
+	readonly REPLICATE_WEBHOOK_SIGNING_SECRET?: string
 }
 
 let _config: Config | undefined
@@ -38,6 +39,7 @@ export const initConfig = (env: Record<string, string>): Config => {
 		DENO_DEPLOYMENT_ID: env['DENO_DEPLOYMENT_ID'],
 		PROJECT_ID: 'zeckson-finance-bot',
 		ROOT_USER_ID: adminUserIds[0],
+		REPLICATE_WEBHOOK_SIGNING_SECRET: env['REPLICATE_WEBHOOK_SIGNING_SECRET'],
 	}) as Config
 
 	return _config
