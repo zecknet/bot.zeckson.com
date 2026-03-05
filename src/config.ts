@@ -3,10 +3,14 @@ export interface Config {
 	readonly DENO_KV_URL?: string
 	readonly REPLICATE_API_TOKEN?: string
 	readonly ADMIN_USER_IDS: string[]
-	readonly DENO_DEPLOYMENT_ID?: string
-	readonly PROJECT_ID: string
 	readonly ROOT_USER_ID: string
 	readonly REPLICATE_WEBHOOK_SIGNING_SECRET?: string
+	readonly BASE_URL?: string
+}
+
+const DEFAULT = {
+	ADMIN_USER_IDS: [],
+	PROJECT_ID: 'zeckson-finance-bot',
 }
 
 let _config: Config | undefined
@@ -31,21 +35,25 @@ export const initConfig = (env: Record<string, string>): Config => {
 
 	const adminUserIds = getEnvArray('ADMIN_USER_IDS')
 
+	const denoDeploymentId = env['DENO_DEPLOYMENT_ID']
 	_config = Object.freeze({
+		...DEFAULT,
 		BOT_TOKEN: getEnv('BOT_TOKEN'),
 		DENO_KV_URL: env['DENO_KV_URL'],
 		REPLICATE_API_TOKEN: env['REPLICATE_API_TOKEN'],
 		ADMIN_USER_IDS: adminUserIds,
-		DENO_DEPLOYMENT_ID: env['DENO_DEPLOYMENT_ID'],
-		PROJECT_ID: 'zeckson-finance-bot',
+		DENO_DEPLOYMENT_ID: denoDeploymentId,
 		ROOT_USER_ID: adminUserIds[0],
 		REPLICATE_WEBHOOK_SIGNING_SECRET: env['REPLICATE_WEBHOOK_SIGNING_SECRET'],
+		BASE_URL: `https://${DEFAULT.PROJECT_ID}${
+			denoDeploymentId ? `-${denoDeploymentId}` : ``
+		}.deno.dev`,
 	}) as Config
 
 	return _config
 }
 
-export const config = new Proxy(
+export const config = new Proxy<Config>(
 	{} as Config & { get<K extends keyof Config>(key: K): Config[K] },
 	{
 		get(_target, prop, _receiver) {

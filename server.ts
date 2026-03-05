@@ -4,9 +4,7 @@ import { bot } from './src/bot.ts'
 import { config } from './src/config.ts'
 import ServerResponse from './src/server/response.ts'
 
-const DEPLOY_URL = `https://${config.PROJECT_ID}${
-	config.DENO_DEPLOYMENT_ID ? `-${config.DENO_DEPLOYMENT_ID}` : ``
-}.deno.dev`
+const DEPLOY_URL = config.BASE_URL
 
 
 const hello = (req: Request) =>
