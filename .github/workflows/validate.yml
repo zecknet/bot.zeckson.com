@@ -1,0 +1,35 @@
+name: Validate
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Validate
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read # Needed to clone the repository
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install step
+        run: "deno install"
+
+      - name: Check files
+        run: "deno check"
+
+      - name: Run tests
+        run: "deno test"
+
+      - name: Lint files
+        run: "deno lint"
+
+
