@@ -1,12 +1,9 @@
 name: Deploy
 on:
-  workflow_run:
-    workflows:
-      - Validate
-    types:
-      - completed
-    branches:
-      - main
+  push:
+    branches: main
+  pull_request:
+    branches: main
 
 jobs:
   deploy:
@@ -33,6 +30,15 @@ jobs:
 
       - name: Install step
         run: "deno install"
+
+      - name: Check files
+        run: "deno check"
+
+      - name: Run tests
+        run: "deno test"
+
+      - name: Lint files
+        run: "deno lint"
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
