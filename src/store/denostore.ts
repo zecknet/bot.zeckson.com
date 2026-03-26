@@ -2,12 +2,12 @@ export class DenoStore {
 	constructor(private db: Deno.Kv) {
 	}
 
-	async save(key: Deno.KvKey, data: object): Promise<boolean> {
+	async save<T>(key: Deno.KvKey, data: T): Promise<boolean> {
 		const result = await this.db.set(key, data)
 		return result.ok
 	}
 
-	async load(key: Deno.KvKey): Promise<Deno.KvEntryMaybe<object>> {
+	async load<T>(key: Deno.KvKey): Promise<Deno.KvEntryMaybe<T>> {
 		return await this.db.get(key)
 	}
 

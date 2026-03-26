@@ -1,5 +1,6 @@
 import './src/config.prod.ts'
 import { setWebhook } from './server.deno.ts'
+import { bot } from './src/bot.ts'
 import { config } from './src/config.ts'
 import { store } from './src/middleware/store.ts'
 
