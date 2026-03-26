@@ -1,6 +1,7 @@
 import './src/config.prod.ts'
 import { handleWebhook, setWebhook } from './server.deno.ts'
 import { bot } from './src/bot.ts'
+import { store } from './src/middleware/store.ts'
 import { config } from './src/config.ts'
 import ServerResponse from './src/server/response.ts'
 
@@ -31,6 +32,16 @@ Deno.serve(async (req) => {
 console.log(`Deno deploy url: ${DEPLOY_URL}`)
 
 if (DEPLOY_URL) {
-	await setWebhook(`${DEPLOY_URL}/${bot.token}`)
+	const key = [`deploy_url`, DEPLOY_URL]
+	const deploymentData = await store.load(key)
+
+	if (deploymentData) {
+		console.log(`Webhook ${DEPLOY_URL} is already set`)
+	} else {
+		const path = `${DEPLOY_URL}/${bot.token}`
+		console.log(`Setting webhook ${path}`)
+		await setWebhook(path)
+		await store.set(key, true)
+	}
 }
 

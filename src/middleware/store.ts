@@ -6,7 +6,8 @@ const openStore = () => {
 	if (config.DENO_KV_URL) return Deno.openKv(config.DENO_KV_URL)
 	else return Deno.openKv()
 }
-const store = new DenoStore(await openStore())
+
+export const store = new DenoStore(await openStore())
 
 const users = await store.list({ prefix: ['user'] })
 
