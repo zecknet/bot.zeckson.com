@@ -10,7 +10,6 @@ export interface Config {
 
 const DEFAULT = {
 	ADMIN_USER_IDS: [],
-	PROJECT_ID: 'zeckson-finance-bot',
 }
 
 let _config: Config | undefined
@@ -35,26 +34,28 @@ export const initConfig = (env: Record<string, string>): Config => {
 
 	const adminUserIds = getEnvArray('ADMIN_USER_IDS')
 
-	const denoDeploymentId = env['DENO_DEPLOYMENT_ID']
+	const isDeploy = env['DENO_DEPLOY'] === 'true'
+
+	const host = isDeploy ?
+        `https://${env['DENO_DEPLOY_APP_SLUG']}-${env['DENO_DEPLOY_BUILD_ID']}.${env['DENO_DEPLOY_ORG_SLUG']}.deno.net` :
+        undefined
+
 	_config = Object.freeze({
 		...DEFAULT,
 		BOT_TOKEN: getEnv('BOT_TOKEN'),
 		DENO_KV_URL: env['DENO_KV_URL'],
 		REPLICATE_API_TOKEN: env['REPLICATE_API_TOKEN'],
 		ADMIN_USER_IDS: adminUserIds,
-		DENO_DEPLOYMENT_ID: denoDeploymentId,
 		ROOT_USER_ID: adminUserIds[0],
 		REPLICATE_WEBHOOK_SIGNING_SECRET:
 			env['REPLICATE_WEBHOOK_SIGNING_SECRET'],
-		BASE_URL: `https://${DEFAULT.PROJECT_ID}${
-			denoDeploymentId ? `-${denoDeploymentId}` : ``
-		}.deno.dev`,
+		BASE_URL: host,
 	}) as Config
 
 	return _config
 }
 
-export const config = new Proxy<Config>(
+export const config: Config = new Proxy<Config>(
 	{} as Config & { get<K extends keyof Config>(key: K): Config[K] },
 	{
 		get(_target, prop, _receiver) {

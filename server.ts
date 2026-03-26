@@ -8,7 +8,7 @@ const DEPLOY_URL = config.BASE_URL
 
 const hello = (req: Request) =>
 	ServerResponse.text(
-		`Hello World!\nRequest url: ${req.url}\nDeploy url: ${DEPLOY_URL}`,
+		`Hello World!\nRequest url: ${req.url}\n`,
 	)
 
 Deno.serve(async (req) => {
@@ -28,6 +28,9 @@ Deno.serve(async (req) => {
 	return response
 })
 
-await setWebhook(`${DEPLOY_URL}/${bot.token}`)
-
 console.log(`Deno deploy url: ${DEPLOY_URL}`)
+
+if (DEPLOY_URL) {
+	await setWebhook(`${DEPLOY_URL}/${bot.token}`)
+}
+
