@@ -27,11 +27,7 @@
     "exclude": ["src/testdata/", "src/fixtures/**/*.ts"]
   },
   "deploy": {
-    "project": "66097785-0b9b-45a0-9980-edd198bf573d",
-    "exclude": [
-      "**/node_modules"
-    ],
-    "include": [],
-    "entrypoint": "server.ts"
+    "org": "zeckson",
+    "app": "zecknet"
   }
 }
