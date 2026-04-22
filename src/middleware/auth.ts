@@ -29,6 +29,8 @@ export const auth = async (
 	)
 
 	if (config.ROOT_USER_ID) {
+		console.log(`Notifying ROOT_USER_ID: ${config.ROOT_USER_ID}`)
+
 		const user = ctx.from
 		const userInfo = user
 			? fmt`User: ${
@@ -49,12 +51,11 @@ export const auth = async (
 				`json`,
 			)
 
-		const bold = FormattedString.b
-		const message = fmt`🚫 ${bold('Unauthorized Request')}
+		const message = fmt`🚫 ${FormattedString.b('Unauthorized Request')}
 
 ${userInfo}
-${bold('Update Type:')} ${FormattedString.code(updateType)}
-${bold('Content:')}
+${FormattedString.b('Update Type:')} ${FormattedString.code(updateType)}
+${FormattedString.b('Content:')}
 ${content}`
 
 		try {
