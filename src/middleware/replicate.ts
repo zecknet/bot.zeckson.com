@@ -15,7 +15,7 @@ replicate.on('business_message', (ctx, next) => {
 	return next()
 })
 
-replicate.on('message', async (ctx, next) => {
+replicate.on('message', (ctx, next) => {
 	const message = ctx.message
 	const msg = message?.text
 
