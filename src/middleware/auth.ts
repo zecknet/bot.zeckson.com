@@ -49,11 +49,12 @@ export const auth = async (
 				`json`,
 			)
 
-		const message = fmt`🚫 ${FormattedString.bold('Unauthorized Request')}
+		const bold = FormattedString.b
+		const message = fmt`🚫 ${bold('Unauthorized Request')}
 
 ${userInfo}
-${FormattedString.bold('Update Type:')} ${FormattedString.code(updateType)}
-${FormattedString.bold('Content:')}
+${bold('Update Type:')} ${FormattedString.code(updateType)}
+${bold('Content:')}
 ${content}`
 
 		try {
