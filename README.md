@@ -22,3 +22,6 @@ deno task test
 ```shell
 deno task lint
 ```
+
+# Bot Features
+- **Topics Support**: Bot can now handle Telegram Forum Topics, responding specifically within threads and providing a `/topic` command.

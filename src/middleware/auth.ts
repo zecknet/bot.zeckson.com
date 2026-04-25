@@ -9,6 +9,12 @@ export const auth = async (
 	const userId = ctx.from?.id.toString()
 	const approvedIds = config.ADMIN_USER_IDS
 
+	// We can get messages like topic creation from ourselves
+	if (ctx.from?.is_bot ) {
+		// TODO: check that it's me, not other bot
+		return await next()
+	}
+
 	if (userId && approvedIds.includes(userId)) {
 		return await next()
 	}
@@ -23,6 +29,8 @@ export const auth = async (
 	)
 
 	if (config.ROOT_USER_ID) {
+		console.log(`Notifying ROOT_USER_ID: ${config.ROOT_USER_ID}`)
+
 		const user = ctx.from
 		const userInfo = user
 			? fmt`User: ${
@@ -43,11 +51,11 @@ export const auth = async (
 				`json`,
 			)
 
-		const message = fmt`🚫 ${FormattedString.bold('Unauthorized Request')}
+		const message = fmt`🚫 ${FormattedString.b('Unauthorized Request')}
 
 ${userInfo}
-${FormattedString.bold('Update Type:')} ${FormattedString.code(updateType)}
-${FormattedString.bold('Content:')}
+${FormattedString.b('Update Type:')} ${FormattedString.code(updateType)}
+${FormattedString.b('Content:')}
 ${content}`
 
 		try {
