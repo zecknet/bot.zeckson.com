@@ -1,6 +1,7 @@
 import './src/config.prod.ts'
 import { handleWebhook } from './server.deno.ts'
 import ServerResponse from './src/server/response.ts'
+import { config } from './src/config.ts'
 
 const hello = (req: Request) =>
     ServerResponse.text(
@@ -23,3 +24,5 @@ Deno.serve(async (req) => {
 
     return response
 })
+
+console.log(`Server started and listening on ${config.BASE_URL}`)
