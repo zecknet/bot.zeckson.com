@@ -1,4 +1,4 @@
-import './src/config.prod.ts'
+import './src/config.local.ts'
 import { handleWebhook } from './server.deno.ts'
 import ServerResponse from './src/server/response.ts'
 import { config } from './src/config.ts'

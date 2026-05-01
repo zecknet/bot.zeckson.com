@@ -36,6 +36,10 @@ export const initConfig = (env: Record<string, string>): Config => {
 
 	const isDeploy = env['DENO_DEPLOY'] === 'true'
 
+	console.log(`Is deploy mode: ${isDeploy}`)
+
+	console.dir(env, { depth: null, colors: true })
+
 	const buildId = env['DENO_DEPLOY_BUILD_ID']
 	const suffix = buildId ? `-${buildId}` : ``
 
