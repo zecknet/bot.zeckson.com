@@ -2,7 +2,7 @@
   "tasks": {
     "dev": "deno run --allow-read --allow-net --allow-env --watch --unstable-kv main.ts",
     "start": "deno run --allow-read --allow-net --allow-env server.ts",
-    "predeploy": "deno run --allow-all --unstable-kv webhook.ts",
+    "predeploy": "deno run --allow-all --unstable-kv webhook.prod.ts",
     "test": "deno test",
     "lint": "deno lint"
   },
