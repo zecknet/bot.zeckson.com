@@ -7,14 +7,18 @@ const openStore = () => {
 	else return Deno.openKv()
 }
 
-export const store = new DenoStore(await openStore())
+const open = async () => new DenoStore(await openStore())
 
-const users = await store.list({ prefix: ['user'] })
+const _startup = async () => {
+	const store = await open()
+	const users = await store.list({ prefix: ['user'] })
 
-console.log(`Records in DB: ${users.length}`)
+	console.log(`Records in DB: ${users.length}`)
+}
 
 export default async (ctx: Context, next: () => Promise<void>) => {
 	const user = ctx.from
+	const store = await open()
 	if (user) {
 		const userkey = [`user`, user.id]
 		const entry = await store.load(userkey)

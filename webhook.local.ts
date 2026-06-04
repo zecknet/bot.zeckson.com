@@ -1,4 +1,4 @@
-import './src/config.prod.ts'
+import './src/config.local.ts'
 import { config } from './src/config.ts'
 import { install } from "./webhook.ts"
 
