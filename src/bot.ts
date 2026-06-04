@@ -1,6 +1,7 @@
 import { Bot } from 'grammy'
 import { config } from './config.ts'
 import { auth } from './middleware/auth.ts'
+import aws from "./middleware/aws.ts"
 import demo from './middleware/demo.ts'
 import exchange from './middleware/exchange.ts'
 import { log } from './middleware/log.ts'
@@ -13,6 +14,7 @@ const bot = new Bot(config.BOT_TOKEN)
 bot.use(log)
 bot.use(store)
 bot.use(auth)
+bot.use(aws)
 bot.use(topics)
 bot.use(replicate)
 bot.use(exchange)

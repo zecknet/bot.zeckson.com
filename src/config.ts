@@ -6,6 +6,9 @@ export interface Config {
 	readonly ROOT_USER_ID: string
 	readonly REPLICATE_WEBHOOK_SIGNING_SECRET?: string
 	readonly BASE_URL?: string
+	readonly AWS_ACCESS_KEY_ID?: string
+	readonly AWS_SECRET_ACCESS_KEY?: string
+	readonly AWS_REGION?: string
 }
 
 const DEFAULT = {
@@ -53,6 +56,9 @@ export const initConfig = (env: Record<string, string>): Config => {
 		REPLICATE_WEBHOOK_SIGNING_SECRET:
 			env['REPLICATE_WEBHOOK_SIGNING_SECRET'],
 		BASE_URL: host,
+		AWS_ACCESS_KEY_ID: env['AWS_ACCESS_KEY_ID'],
+		AWS_SECRET_ACCESS_KEY: env['AWS_SECRET_ACCESS_KEY'],
+		AWS_REGION: env['AWS_REGION'] || 'us-east-1',
 	}) as Config
 
 	return _config
