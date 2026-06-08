@@ -1,27 +1,14 @@
 import { Composer, InlineKeyboard } from 'grammy'
 import { config } from '../config.ts'
-import { DenoStore } from '../store/denostore.ts'
 import { getName } from "../util/user.ts"
+import { BotRepository, ManagedBot } from '../repository/bot.repository.ts'
 
 const bots = new Composer()
-
-const openStore = async () => {
-    const kv = await (config.DENO_KV_URL ? Deno.openKv(config.DENO_KV_URL) : Deno.openKv())
-    return new DenoStore(kv)
-}
-
-interface ManagedBot {
-    token: string
-    addedBy: number
-    addedAt: number
-    name?: string
-}
 
 // simple escape for markdown v2
 // TODO: use formatted text library @grammyjs/parse-mode
 const escape = (text: string | number) => text.toString().replace(/[_*[\]()~`>#+-=|{}.!]/g, '\\$&')
 
-//TODO: split storing logic and business logic to different file/files
 //TODO: add dests on business logic, like storing, names, etc...
 bots.command('addbot', async (ctx) => {
     const me = await ctx.api.getMe()
@@ -46,13 +33,12 @@ bots.on('managed_bot', async (ctx) => {
     if (!userId) return
 
     const token = await ctx.api.getManagedBotToken(bot.id)
-    const botKey = ['managed_bot', String(bot.id)]
 
     try {
-        const store = await openStore()
-        const existing = await store.load(botKey)
+        const repo = await BotRepository.create()
+        const existing = await repo.getBot(String(bot.id))
 
-        if (existing.value) {
+        if (existing) {
             return ctx.reply('This bot is already managed.')
         }
 
@@ -63,7 +49,7 @@ bots.on('managed_bot', async (ctx) => {
             name: getName(bot),
         }
 
-        await store.save(botKey, managedBot)
+        await repo.saveBot(String(bot.id), managedBot)
         await ctx.reply(
             `Managed bot created successfully\\!\n\n` +
             `*Name:* ${escape(managedBot.name)}\n` +
@@ -98,20 +84,16 @@ bots.command('listbots', async (ctx) => {
         return
     }
 
-    // simple escape for markdown v2
-    const escape = (text: string | number) => text.toString().replace(/[_*[\]()~`>#+-=|{}.!]/g, '\\$&')
-
     try {
-        const store = await openStore()
-        const managedBots = await store.list({ prefix: ['managed_bot'] })
+        const repo = await BotRepository.create()
+        const managedBots = await repo.listBots()
 
         if (managedBots.length === 0) {
             return ctx.reply('No managed bots found.')
         }
 
         const botList = managedBots
-            .map((entry) => {
-                const bot = entry.value as ManagedBot
+            .map((bot) => {
                 const botName = bot.name ? ` \\- ${escape(bot.name)}` : ''
                 return `\\- \`${escape(bot.token)}\` (added by ${escape(bot.addedBy)})${botName}`
             })
