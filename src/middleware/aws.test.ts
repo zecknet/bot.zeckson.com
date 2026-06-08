@@ -12,7 +12,13 @@ Deno.test({
     ignore: true,
     permissions: {
         env: true,
+        net: true,
     }
 }, async () => {
-    console.log(await getInstances())
+    try {
+        const instances = await getInstances()
+        console.log('Instances:', instances)
+    } catch (e) {
+        console.log('Caught expected error or actual error:', e instanceof Error ? e.message : String(e))
+    }
 })

@@ -1,5 +1,11 @@
-import { DescribeInstancesCommand, EC2Client, Instance } from '@aws-sdk/client-ec2'
-import { Composer } from 'grammy'
+import {
+	DescribeInstancesCommand,
+	EC2Client,
+	Instance,
+	StartInstancesCommand,
+	StopInstancesCommand,
+} from '@aws-sdk/client-ec2'
+import { Composer, InlineKeyboard } from 'grammy'
 import { config } from '../config.ts'
 
 const aws = new Composer()
@@ -31,32 +37,76 @@ const toString = (ins: Instance): string => {
 	return `${name} (${id})\nType: ${type}\nState: ${state}`
 }
 
-export const getInstances = async (): Promise<string[]> => {
+export const getInstances = async (): Promise<Instance[]> => {
 	const client = getEC2Client()
 	const command = new DescribeInstancesCommand({})
 	const response = await client.send(command)
 
-	const instances = response.Reservations?.flatMap(
+	return response.Reservations?.flatMap(
 		(r) => r.Instances || [],
 	) || []
-
-	return instances
-		.map(toString)
 }
 
+export const startInstance = async (instanceId: string) => {
+	const client = getEC2Client()
+	const command = new StartInstancesCommand({ InstanceIds: [instanceId] })
+	return await client.send(command)
+}
+
+export const stopInstance = async (instanceId: string) => {
+	const client = getEC2Client()
+	const command = new StopInstancesCommand({ InstanceIds: [instanceId] })
+	return await client.send(command)
+}
 
 aws.command('ec2', async (ctx) => {
 	try {
-		const list = await getInstances();
+		const instances = await getInstances();
 
-		if (list.length === 0) {
+		if (instances.length === 0) {
 			await ctx.reply('No EC2 instances found.')
+			return
 		}
 
-		await ctx.reply(`EC2 Instances:\n\n${list.join('\n\n')}`, { parse_mode: 'Markdown' })
+		for (const ins of instances) {
+			const text = toString(ins)
+			const keyboard = new InlineKeyboard()
+			const state = ins.State?.Name
+			const id = ins.InstanceId
+
+			if (state === 'stopped') {
+				keyboard.text('▶️ Start', `aws:start:${id}`)
+			} else if (state === 'running') {
+				keyboard.text('⏹️ Stop', `aws:stop:${id}`)
+			}
+
+			await ctx.reply(text, {
+				parse_mode: 'Markdown',
+				reply_markup: keyboard,
+			})
+		}
 	} catch (error) {
 		console.error('EC2 Error:', error)
 		await ctx.reply(`Failed to fetch EC2 instances: ${error instanceof Error ? error.message : String(error)}`)
+	}
+})
+
+aws.callbackQuery(/^aws:(start|stop):(.+)$/, async (ctx) => {
+	const [, action, instanceId] = ctx.match
+	try {
+		await ctx.answerCallbackQuery({ text: `${action === 'start' ? 'Starting' : 'Stopping'} instance...` })
+
+		if (action === 'start') {
+			await startInstance(instanceId)
+		} else {
+			await stopInstance(instanceId)
+		}
+
+		await ctx.editMessageReplyMarkup({ reply_markup: undefined })
+		await ctx.reply(`Instance \`${instanceId}\` ${action === 'start' ? 'starting' : 'stopping'}...`, { parse_mode: 'Markdown' })
+	} catch (error) {
+		console.error(`EC2 ${action} Error:`, error)
+		await ctx.reply(`Failed to ${action} instance: ${error instanceof Error ? error.message : String(error)}`)
 	}
 })
 
