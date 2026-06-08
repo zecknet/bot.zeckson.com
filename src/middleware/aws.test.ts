@@ -7,6 +7,6 @@ Deno.test({
         env: true,
     }
 }, async () => {
-    // await import(`../config.local.ts`)
+    await import(`../config.local.ts`)
     console.log(await getInstances())
 })
