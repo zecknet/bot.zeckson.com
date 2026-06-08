@@ -9,12 +9,7 @@ export interface ManagedBot {
 }
 
 export class BotRepository {
-    private constructor(private store: DenoStore) {}
-
-    static async create(): Promise<BotRepository> {
-        const kv = await (config.DENO_KV_URL ? Deno.openKv(config.DENO_KV_URL) : Deno.openKv())
-        return new BotRepository(new DenoStore(kv))
-    }
+    constructor(private store: DenoStore) {}
 
     async saveBot(botId: string, bot: ManagedBot): Promise<void> {
         const botKey = ['managed_bot', botId]

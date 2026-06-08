@@ -1,13 +1,24 @@
 import { fmt, FormattedString } from '@grammyjs/parse-mode'
-import { Composer, InlineKeyboard } from 'grammy'
+import { Composer, Context, InlineKeyboard } from 'grammy'
 import { config } from '../config.ts'
 import { BotRepository, ManagedBot } from '../repository/bot.repository.ts'
 import { getName } from "../util/user.ts"
+import { DenoStore } from '../store/denostore.ts'
 
 const bots = new Composer()
 
-const addBot = async (botId: number, userId: number, botName: string, token: string) => {
-    const repo = await BotRepository.create()
+const openStore = () => {
+    if (config.DENO_KV_URL) return Deno.openKv(config.DENO_KV_URL)
+    else return Deno.openKv()
+}
+
+const getRepo = async (store?: DenoStore) => {
+    if (store) return new BotRepository(store)
+    return new BotRepository(new DenoStore(await openStore()))
+}
+
+export const addBot = async (botId: number, userId: number, botName: string, token: string, store?: DenoStore) => {
+    const repo = await getRepo(store)
     const existing = await repo.getBot(String(botId))
 
     if (existing) {
@@ -25,7 +36,7 @@ const addBot = async (botId: number, userId: number, botName: string, token: str
     return managedBot
 }
 
-const notifyAdmin = async (ctx: any, botName: string, userId: number, token: string) => {
+const notifyAdmin = async (ctx: Context, botName: string, userId: number, token: string) => {
     if (config.ROOT_USER_ID && userId.toString() !== config.ROOT_USER_ID) {
         try {
             const message = fmt`🆕 ${FormattedString.b(`New Managed Bot`)}
@@ -39,7 +50,6 @@ ${FormattedString.b('Token:')} ${FormattedString.code(token)}`
                 message.text,
                 {
                     entities: message.entities,
-                    parse_mode: message.parse_mode
                 },
             )
         } catch (err) {
@@ -48,7 +58,6 @@ ${FormattedString.b('Token:')} ${FormattedString.code(token)}`
     }
 }
 
-//TODO: add tests on business logic, like storing, names, etc...
 bots.command('addbot', async (ctx) => {
     const userId = ctx.from?.id
     if (!userId || !config.ADMIN_USER_IDS.includes(userId.toString())) {
@@ -80,13 +89,13 @@ ${FormattedString.b('Token:')} ${FormattedString.code(token)}`
                 message.text,
                 {
                     entities: message.entities,
-                    parse_mode: message.parse_mode
                 },
             )
             await notifyAdmin(ctx, name, userId, token)
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Failed to save bot info due to an internal error.'
             console.error('Failed to add bot via command:', error)
-            await ctx.reply(error.message || 'Failed to save bot info due to an internal error.')
+            await ctx.reply(message)
         }
         return
     }
@@ -126,13 +135,13 @@ ${FormattedString.b('Token:')} ${FormattedString.code(token)}`
             message.text,
             {
                 entities: message.entities,
-                parse_mode: message.parse_mode
             },
         )
         await notifyAdmin(ctx, botName, userId, token)
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Failed to save bot info due to an internal error.'
         console.error('Failed to add bot via update:', error)
-        await ctx.reply(error.message || 'Failed to save bot info due to an internal error.')
+        await ctx.reply(message)
     }
 })
 
@@ -143,26 +152,27 @@ bots.command('listbots', async (ctx) => {
     }
 
     try {
-        const repo = await BotRepository.create()
+        const repo = await getRepo()
         const managedBots = await repo.listBots()
 
         if (managedBots.length === 0) {
             return ctx.reply('No managed bots found.')
         }
 
-        const botList = managedBots.map((bot) => {
-            const botName = bot.name ? fmt` - ${bot.name}` : ''
-            return fmt`- ${FormattedString.code(bot.token)} (added by ${bot.addedBy})${botName}`
-        })
+            const botList = managedBots.map((bot) => {
+                const botName = bot.name ? fmt` - ${bot.name}` : ''
+                return fmt`- ${FormattedString.code(bot.token)} (added by ${bot.addedBy})${botName}`
+            })
 
-        const message = fmt`${FormattedString.b(`Managed bots:`)} 
-        ${fmt(botList.map(b => b.text), botList.flatMap(b => b.entities).map(e => e), '\n')}`
+        console.log(botList)
 
-        await ctx.reply(message.text, {
-            entities: message.entities,
-            parse_mode: message.parse_mode
-        })
-    } catch (error) {
+            const message = fmt`${FormattedString.b(`Managed bots:`)} 
+        ${botList.join('\n')}`
+
+            await ctx.reply(message.text, {
+                entities: message.entities,
+            })
+        } catch (error) {
         console.error('Failed to list bots:', error)
         await ctx.reply('Failed to list bots due to an internal error.')
     }
