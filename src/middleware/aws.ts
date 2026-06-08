@@ -5,7 +5,7 @@ import {
 	StartInstancesCommand,
 	StopInstancesCommand,
 } from '@aws-sdk/client-ec2'
-import { Composer, InlineKeyboard } from 'grammy'
+import { Composer, Context, InlineKeyboard } from 'grammy'
 import { config } from '../config.ts'
 
 const aws = new Composer()
@@ -59,7 +59,7 @@ export const stopInstance = async (instanceId: string) => {
 	return await client.send(command)
 }
 
-aws.command('ec2', async (ctx) => {
+export const ec2Handler = async (ctx: Context) => {
 	try {
 		const instances = await getInstances();
 
@@ -89,9 +89,11 @@ aws.command('ec2', async (ctx) => {
 		console.error('EC2 Error:', error)
 		await ctx.reply(`Failed to fetch EC2 instances: ${error instanceof Error ? error.message : String(error)}`)
 	}
-})
+}
 
-aws.callbackQuery(/^aws:(start|stop):(.+)$/, async (ctx) => {
+aws.command('ec2', ec2Handler)
+
+export const callbackHandler = async (ctx: Context & { match: RegExpExecArray }) => {
 	const [, action, instanceId] = ctx.match
 	try {
 		await ctx.answerCallbackQuery({ text: `${action === 'start' ? 'Starting' : 'Stopping'} instance...` })
@@ -108,6 +110,8 @@ aws.callbackQuery(/^aws:(start|stop):(.+)$/, async (ctx) => {
 		console.error(`EC2 ${action} Error:`, error)
 		await ctx.reply(`Failed to ${action} instance: ${error instanceof Error ? error.message : String(error)}`)
 	}
-})
+}
+
+aws.callbackQuery(/^aws:(start|stop):(.+)$/, callbackHandler as any)
 
 export default aws
