@@ -1,4 +1,11 @@
+import { initConfig } from "../config.ts"
 import { getInstances } from './aws.ts'
+
+// Mock config for testing
+initConfig({
+    ADMIN_USER_IDS: '12345',
+    BOT_TOKEN: 'test_token',
+})
 
 Deno.test({
     name: 'get instances',
@@ -7,6 +14,5 @@ Deno.test({
         env: true,
     }
 }, async () => {
-    await import(`../config.local.ts`)
     console.log(await getInstances())
 })
