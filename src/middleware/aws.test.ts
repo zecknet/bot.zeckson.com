@@ -1,7 +1,7 @@
-import { EC2Client } from '@aws-sdk/client-ec2'
+import { DescribeInstancesCommand, EC2Client, Instance, StartInstancesCommand, StopInstancesCommand, } from '@aws-sdk/client-ec2'
 import { assertEquals } from '@std/assert'
 import { stub } from '@std/testing/mock'
-import { Context } from 'grammy'
+import { Context, InlineKeyboard } from 'grammy'
 import { initConfig } from '../config.ts'
 import { callbackHandler, ec2Handler, getInstances, startInstance, stopInstance, } from './aws.ts'
 
@@ -15,7 +15,7 @@ initConfig({
 })
 
 Deno.test('getInstances returns instances from AWS', async () => {
-	const mockInstances = [
+	const mockInstances: Instance[] = [
 		{
 			InstanceId: 'i-123',
 			State: { Name: 'running' },
@@ -23,8 +23,8 @@ Deno.test('getInstances returns instances from AWS', async () => {
 		},
 	]
 
-	const sendStub = stub(EC2Client.prototype, 'send', (command: any) => {
-		if (command.constructor.name === 'DescribeInstancesCommand') {
+	const sendStub = stub(EC2Client.prototype, 'send', (command) => {
+		if (command instanceof DescribeInstancesCommand) {
 			return Promise.resolve({
 				Reservations: [{ Instances: mockInstances }],
 			})
@@ -44,8 +44,8 @@ Deno.test('getInstances returns instances from AWS', async () => {
 
 Deno.test('startInstance sends StartInstancesCommand', async () => {
 	let commandSent = false
-	const sendStub = stub(EC2Client.prototype, 'send', (command: any) => {
-		if (command.constructor.name === 'StartInstancesCommand') {
+	const sendStub = stub(EC2Client.prototype, 'send', (command) => {
+		if (command instanceof StartInstancesCommand) {
 			commandSent = true
 			assertEquals(command.input.InstanceIds, ['i-123'])
 			return Promise.resolve({})
@@ -63,8 +63,8 @@ Deno.test('startInstance sends StartInstancesCommand', async () => {
 
 Deno.test('stopInstance sends StopInstancesCommand', async () => {
 	let commandSent = false
-	const sendStub = stub(EC2Client.prototype, 'send', (command: any) => {
-		if (command.constructor.name === 'StopInstancesCommand') {
+	const sendStub = stub(EC2Client.prototype, 'send', (command) => {
+		if (command instanceof StopInstancesCommand) {
 			commandSent = true
 			assertEquals(command.input.InstanceIds, ['i-123'])
 			return Promise.resolve({})
@@ -81,7 +81,7 @@ Deno.test('stopInstance sends StopInstancesCommand', async () => {
 })
 
 Deno.test('ec2 command sends instance info', async () => {
-	const mockInstances = [
+	const mockInstances: Instance[] = [
 		{
 			InstanceId: 'i-123',
 			State: { Name: 'stopped' },
@@ -90,8 +90,8 @@ Deno.test('ec2 command sends instance info', async () => {
 		},
 	]
 
-	const sendStub = stub(EC2Client.prototype, 'send', (command: any) => {
-		if (command.constructor.name === 'DescribeInstancesCommand') {
+	const sendStub = stub(EC2Client.prototype, 'send', (command) => {
+		if (command instanceof DescribeInstancesCommand) {
 			return Promise.resolve({
 				Reservations: [{ Instances: mockInstances }],
 			})
@@ -99,9 +99,9 @@ Deno.test('ec2 command sends instance info', async () => {
 		return Promise.reject(new Error('Unknown command'))
 	})
 
-	const replies: any[] = []
+	const replies: { text: string; options?: { reply_markup: InlineKeyboard } }[] = []
 	const ctx = {
-		reply: (text: string, options: any) => {
+		reply: (text: string, options?: { reply_markup: InlineKeyboard }) => {
 			replies.push({ text, options })
 			return Promise.resolve()
 		},
@@ -113,7 +113,7 @@ Deno.test('ec2 command sends instance info', async () => {
 		assertEquals(replies[0].text.includes('*TestInstance*'), true)
 		assertEquals(replies[0].text.includes('`i-123`'), true)
 		assertEquals(
-			replies[0].options.reply_markup.inline_keyboard[0][0].text,
+			replies[0].options?.reply_markup?.inline_keyboard?.[0][0].text,
 			'▶️ Start',
 		)
 	} finally {
@@ -123,24 +123,24 @@ Deno.test('ec2 command sends instance info', async () => {
 
 Deno.test('callbackHandler processes start action', async () => {
 	let commandSent = false
-	const sendStub = stub(EC2Client.prototype, 'send', (command: any) => {
-		if (command.constructor.name === 'StartInstancesCommand') {
+	const sendStub = stub(EC2Client.prototype, 'send', (command) => {
+		if (command instanceof StartInstancesCommand) {
 			commandSent = true
 			return Promise.resolve({})
 		}
 		return Promise.reject(new Error('Unknown command'))
 	})
 
-	const answers: any[] = []
-	const replies: any[] = []
+	const answers: { text?: string }[] = []
+	const replies: { text: string; options?: unknown }[] = []
 	const ctx = {
 		match: [, 'start', 'i-123'],
-		answerCallbackQuery: (options: any) => {
+		answerCallbackQuery: (options: { text?: string }) => {
 			answers.push(options)
 			return Promise.resolve()
 		},
 		editMessageReplyMarkup: () => Promise.resolve(),
-		reply: (text: string, options: any) => {
+		reply: (text: string, options?: unknown) => {
 			replies.push({ text, options })
 			return Promise.resolve()
 		},
@@ -159,24 +159,24 @@ Deno.test('callbackHandler processes start action', async () => {
 
 Deno.test('callbackHandler processes stop action', async () => {
 	let commandSent = false
-	const sendStub = stub(EC2Client.prototype, 'send', (command: any) => {
-		if (command.constructor.name === 'StopInstancesCommand') {
+	const sendStub = stub(EC2Client.prototype, 'send', (command) => {
+		if (command instanceof StopInstancesCommand) {
 			commandSent = true
 			return Promise.resolve({})
 		}
 		return Promise.reject(new Error('Unknown command'))
 	})
 
-	const answers: any[] = []
-	const replies: any[] = []
+	const answers: { text?: string }[] = []
+	const replies: { text: string; options?: unknown }[] = []
 	const ctx = {
 		match: [, 'stop', 'i-456'],
-		answerCallbackQuery: (options: any) => {
+		answerCallbackQuery: (options: { text?: string }) => {
 			answers.push(options)
 			return Promise.resolve()
 		},
 		editMessageReplyMarkup: () => Promise.resolve(),
-		reply: (text: string, options: any) => {
+		reply: (text: string, options?: unknown) => {
 			replies.push({ text, options })
 			return Promise.resolve()
 		},
@@ -188,6 +188,53 @@ Deno.test('callbackHandler processes stop action', async () => {
 		assertEquals(answers[0].text, 'Stopping instance...')
 		assertEquals(replies[0].text.includes('i-456'), true)
 		assertEquals(replies[0].text.includes('stopping'), true)
+	} finally {
+		sendStub.restore()
+	}
+})
+
+Deno.test('ec2 command handles error when fetching instances', async () => {
+	const sendStub = stub(EC2Client.prototype, 'send', () => {
+		return Promise.reject(new Error('AWS Error'))
+	})
+
+	const replies: string[] = []
+	const ctx = {
+		reply: (text: string) => {
+			replies.push(text)
+			return Promise.resolve()
+		},
+	} as unknown as Context
+
+	try {
+		await ec2Handler(ctx)
+		assertEquals(replies.length, 1)
+		assertEquals(replies[0].includes('Failed to fetch EC2 instances: AWS Error'), true)
+	} finally {
+		sendStub.restore()
+	}
+})
+
+Deno.test('callbackHandler handles error when starting instance', async () => {
+	const sendStub = stub(EC2Client.prototype, 'send', () => {
+		return Promise.reject(new Error('Start Error'))
+	})
+
+	const replies: string[] = []
+	const ctx = {
+		match: [, 'start', 'i-123'],
+		answerCallbackQuery: () => Promise.resolve(),
+		editMessageReplyMarkup: () => Promise.resolve(),
+		reply: (text: string) => {
+			replies.push(text)
+			return Promise.resolve()
+		},
+	} as unknown as Context & { match: RegExpExecArray }
+
+	try {
+		await callbackHandler(ctx)
+		assertEquals(replies.length, 1)
+		assertEquals(replies[0].includes('Failed to start instance: Start Error'), true)
 	} finally {
 		sendStub.restore()
 	}

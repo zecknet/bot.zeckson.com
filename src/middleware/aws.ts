@@ -112,6 +112,6 @@ export const callbackHandler = async (ctx: Context & { match: RegExpExecArray })
 	}
 }
 
-aws.callbackQuery(/^aws:(start|stop):(.+)$/, callbackHandler as any)
+aws.callbackQuery(/^aws:(start|stop):(.+)$/, callbackHandler as unknown as (ctx: Context) => Promise<void>)
 
 export default aws
