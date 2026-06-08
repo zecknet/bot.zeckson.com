@@ -1,5 +1,4 @@
 import { DenoStore } from '../store/denostore.ts'
-import { config } from '../config.ts'
 
 export interface ManagedBot {
     token: string
@@ -9,7 +8,8 @@ export interface ManagedBot {
 }
 
 export class BotRepository {
-    constructor(private store: DenoStore) {}
+    constructor(private store: DenoStore) {
+    }
 
     async saveBot(botId: string, bot: ManagedBot): Promise<void> {
         const botKey = ['managed_bot', botId]

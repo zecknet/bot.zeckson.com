@@ -1,19 +1,6 @@
 import { assertEquals } from "@std/assert";
-import { BotRepository } from "./bot.repository.ts";
-import { initConfig } from "../config.ts";
-
 import { DenoStore } from "../store/denostore.ts";
-import { config } from "../config.ts";
-
-// Initialize config for tests
-try {
-    initConfig({
-        BOT_TOKEN: "test_token",
-        ADMIN_USER_IDS: "123",
-    });
-} catch (_e) {
-    // Config might be already initialized in some environments
-}
+import { BotRepository } from "./bot.repository.ts";
 
 const openStore = () => {
     return Deno.openKv(":memory:")
