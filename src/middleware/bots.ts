@@ -1,13 +1,10 @@
+import { fmt, FormattedString } from '@grammyjs/parse-mode'
 import { Composer, InlineKeyboard } from 'grammy'
 import { config } from '../config.ts'
-import { getName } from "../util/user.ts"
 import { BotRepository, ManagedBot } from '../repository/bot.repository.ts'
+import { getName } from "../util/user.ts"
 
 const bots = new Composer()
-
-// simple escape for markdown v2
-// TODO: use formatted text library @grammyjs/parse-mode
-const escape = (text: string | number) => text.toString().replace(/[_*[\]()~`>#+-=|{}.!]/g, '\\$&')
 
 const addBot = async (botId: number, userId: number, botName: string, token: string) => {
     const repo = await BotRepository.create()
@@ -31,13 +28,19 @@ const addBot = async (botId: number, userId: number, botName: string, token: str
 const notifyAdmin = async (ctx: any, botName: string, userId: number, token: string) => {
     if (config.ROOT_USER_ID && userId.toString() !== config.ROOT_USER_ID) {
         try {
+            const message = fmt`🆕 ${FormattedString.b(`New Managed Bot`)}
+
+${FormattedString.b('Name:')} ${botName}
+${FormattedString.b('Created by:')} ${userId}
+${FormattedString.b('Token:')} ${FormattedString.code(token)}`
+
             await ctx.api.sendMessage(
                 config.ROOT_USER_ID,
-                `🆕 *New Managed Bot*\n\n` +
-                `*Name:* ${escape(botName)}\n` +
-                `*Created by:* ${escape(userId)}\n` +
-                `*Token:* \`${escape(token)}\``,
-                { parse_mode: 'MarkdownV2' },
+                message.text,
+                {
+                    entities: message.entities,
+                    parse_mode: message.parse_mode
+                },
             )
         } catch (err) {
             console.error('Failed to notify root admin about new managed bot:', err)
@@ -45,7 +48,7 @@ const notifyAdmin = async (ctx: any, botName: string, userId: number, token: str
     }
 }
 
-//TODO: add dests on business logic, like storing, names, etc...
+//TODO: add tests on business logic, like storing, names, etc...
 bots.command('addbot', async (ctx) => {
     const userId = ctx.from?.id
     if (!userId || !config.ADMIN_USER_IDS.includes(userId.toString())) {
@@ -68,11 +71,17 @@ bots.command('addbot', async (ctx) => {
         try {
             const token = await ctx.api.getManagedBotToken(botId)
             const managedBot = await addBot(botId, userId, name, token)
+            const message = fmt`Managed bot created successfully!
+
+${FormattedString.b('Name:')} ${managedBot.name || ''}
+${FormattedString.b('Token:')} ${FormattedString.code(token)}`
+
             await ctx.reply(
-                `Managed bot created successfully\\!\n\n` +
-                `*Name:* ${escape(managedBot.name || '')}\n` +
-                `*Token:* \`${escape(token)}\``,
-                { parse_mode: 'MarkdownV2' },
+                message.text,
+                {
+                    entities: message.entities,
+                    parse_mode: message.parse_mode
+                },
             )
             await notifyAdmin(ctx, name, userId, token)
         } catch (error: any) {
@@ -108,11 +117,17 @@ bots.on('managed_bot', async (ctx) => {
         const botName = getName(bot)
         const token = await ctx.api.getManagedBotToken(botId)
         const managedBot = await addBot(botId, userId, botName, token)
+        const message = fmt`Managed bot created successfully!
+
+${FormattedString.b('Name:')} ${managedBot.name || ''}
+${FormattedString.b('Token:')} ${FormattedString.code(token)}`
+
         await ctx.reply(
-            `Managed bot created successfully\\!\n\n` +
-            `*Name:* ${escape(managedBot.name || '')}\n` +
-            `*Token:* \`${escape(token)}\``,
-            { parse_mode: 'MarkdownV2' },
+            message.text,
+            {
+                entities: message.entities,
+                parse_mode: message.parse_mode
+            },
         )
         await notifyAdmin(ctx, botName, userId, token)
     } catch (error: any) {
@@ -135,14 +150,18 @@ bots.command('listbots', async (ctx) => {
             return ctx.reply('No managed bots found.')
         }
 
-        const botList = managedBots
-            .map((bot) => {
-                const botName = bot.name ? ` \\- ${escape(bot.name)}` : ''
-                return `\\- \`${escape(bot.token)}\` (added by ${escape(bot.addedBy)})${botName}`
-            })
-            .join('\n')
+        const botList = managedBots.map((bot) => {
+            const botName = bot.name ? fmt` - ${bot.name}` : ''
+            return fmt`- ${FormattedString.code(bot.token)} (added by ${bot.addedBy})${botName}`
+        })
 
-        await ctx.reply(`*Managed bots:*\n${botList}`, { parse_mode: 'MarkdownV2' })
+        const message = fmt`${FormattedString.b(`Managed bots:`)} 
+        ${fmt(botList.map(b => b.text), botList.flatMap(b => b.entities).map(e => e), '\n')}`
+
+        await ctx.reply(message.text, {
+            entities: message.entities,
+            parse_mode: message.parse_mode
+        })
     } catch (error) {
         console.error('Failed to list bots:', error)
         await ctx.reply('Failed to list bots due to an internal error.')
