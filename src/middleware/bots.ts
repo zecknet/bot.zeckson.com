@@ -9,50 +9,39 @@ const bots = new Composer()
 // TODO: use formatted text library @grammyjs/parse-mode
 const escape = (text: string | number) => text.toString().replace(/[_*[\]()~`>#+-=|{}.!]/g, '\\$&')
 
-const addBot = async (ctx: any, botId: number, userId: number, botName: string) => {
-    const token = await ctx.api.getManagedBotToken(botId)
+const addBot = async (botId: number, userId: number, botName: string, token: string) => {
+    const repo = await BotRepository.create()
+    const existing = await repo.getBot(String(botId))
 
-    try {
-        const repo = await BotRepository.create()
-        const existing = await repo.getBot(String(botId))
+    if (existing) {
+        throw new Error('This bot is already managed.')
+    }
 
-        if (existing) {
-            return ctx.reply('This bot is already managed.')
+    const managedBot: ManagedBot = {
+        token,
+        addedBy: userId,
+        addedAt: Date.now(),
+        name: botName,
+    }
+
+    await repo.saveBot(String(botId), managedBot)
+    return managedBot
+}
+
+const notifyAdmin = async (ctx: any, botName: string, userId: number, token: string) => {
+    if (config.ROOT_USER_ID && userId.toString() !== config.ROOT_USER_ID) {
+        try {
+            await ctx.api.sendMessage(
+                config.ROOT_USER_ID,
+                `🆕 *New Managed Bot*\n\n` +
+                `*Name:* ${escape(botName)}\n` +
+                `*Created by:* ${escape(userId)}\n` +
+                `*Token:* \`${escape(token)}\``,
+                { parse_mode: 'MarkdownV2' },
+            )
+        } catch (err) {
+            console.error('Failed to notify root admin about new managed bot:', err)
         }
-
-        const managedBot: ManagedBot = {
-            token,
-            addedBy: userId,
-            addedAt: Date.now(),
-            name: botName,
-        }
-
-        await repo.saveBot(String(botId), managedBot)
-        await ctx.reply(
-            `Managed bot created successfully\\!\n\n` +
-            `*Name:* ${escape(managedBot.name || '')}\n` +
-            `*Token:* \`${escape(token)}\``,
-            { parse_mode: 'MarkdownV2' },
-        )
-
-        // Notify root admin if it was not them who created it
-        if (config.ROOT_USER_ID && userId.toString() !== config.ROOT_USER_ID) {
-            try {
-                await ctx.api.sendMessage(
-                    config.ROOT_USER_ID,
-                    `🆕 *New Managed Bot*\n\n` +
-                    `*Name:* ${escape(botName)}\n` +
-                    `*Created by:* ${escape(userId)}\n` +
-                    `*Token:* \`${escape(token)}\``,
-                    { parse_mode: 'MarkdownV2' },
-                )
-            } catch (err) {
-                console.error('Failed to notify root admin about new managed bot:', err)
-            }
-        }
-    } catch (error) {
-        console.error('Failed to save managed bot shared:', error)
-        await ctx.reply('Failed to save bot info due to an internal error.')
     }
 }
 
@@ -76,7 +65,21 @@ bots.command('addbot', async (ctx) => {
         } catch (e) {
             console.warn(`Could not get bot name for ID ${botId}:`, e)
         }
-        return addBot(ctx, botId, userId, name)
+        try {
+            const token = await ctx.api.getManagedBotToken(botId)
+            const managedBot = await addBot(botId, userId, name, token)
+            await ctx.reply(
+                `Managed bot created successfully\\!\n\n` +
+                `*Name:* ${escape(managedBot.name || '')}\n` +
+                `*Token:* \`${escape(token)}\``,
+                { parse_mode: 'MarkdownV2' },
+            )
+            await notifyAdmin(ctx, name, userId, token)
+        } catch (error: any) {
+            console.error('Failed to add bot via command:', error)
+            await ctx.reply(error.message || 'Failed to save bot info due to an internal error.')
+        }
+        return
     }
 
     const me = await ctx.api.getMe()
@@ -100,7 +103,22 @@ bots.on('managed_bot', async (ctx) => {
 
     if (!userId) return
 
-    await addBot(ctx, bot.id, userId, getName(bot))
+    try {
+        const botId = bot.id
+        const botName = getName(bot)
+        const token = await ctx.api.getManagedBotToken(botId)
+        const managedBot = await addBot(botId, userId, botName, token)
+        await ctx.reply(
+            `Managed bot created successfully\\!\n\n` +
+            `*Name:* ${escape(managedBot.name || '')}\n` +
+            `*Token:* \`${escape(token)}\``,
+            { parse_mode: 'MarkdownV2' },
+        )
+        await notifyAdmin(ctx, botName, userId, token)
+    } catch (error: any) {
+        console.error('Failed to add bot via update:', error)
+        await ctx.reply(error.message || 'Failed to save bot info due to an internal error.')
+    }
 })
 
 bots.command('listbots', async (ctx) => {
