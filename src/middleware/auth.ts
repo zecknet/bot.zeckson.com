@@ -6,6 +6,11 @@ export const auth = async (
 	ctx: Context,
 	next: NextFunction,
 ) => {
+	// Pass all service messages from  telegram, like "managed_bot"
+	if (!ctx.from) {
+		return next()
+	}
+
 	const userId = ctx.from?.id.toString()
 	const approvedIds = config.ADMIN_USER_IDS
 
