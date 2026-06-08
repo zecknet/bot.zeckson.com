@@ -134,7 +134,7 @@ Deno.test('callbackHandler processes start action', async () => {
 	const answers: { text?: string }[] = []
 	const replies: { text: string; options?: unknown }[] = []
 	const ctx = {
-		match: [, 'start', 'i-123'],
+		match: [undefined, 'start', 'i-123'],
 		answerCallbackQuery: (options: { text?: string }) => {
 			answers.push(options)
 			return Promise.resolve()
@@ -170,7 +170,7 @@ Deno.test('callbackHandler processes stop action', async () => {
 	const answers: { text?: string }[] = []
 	const replies: { text: string; options?: unknown }[] = []
 	const ctx = {
-		match: [, 'stop', 'i-456'],
+		match: [undefined, 'stop', 'i-456'],
 		answerCallbackQuery: (options: { text?: string }) => {
 			answers.push(options)
 			return Promise.resolve()
@@ -222,7 +222,7 @@ Deno.test('callbackHandler handles error when starting instance', async () => {
 
 	const replies: string[] = []
 	const ctx = {
-		match: [, 'start', 'i-123'],
+		match: [undefined, 'start', 'i-123'],
 		answerCallbackQuery: () => Promise.resolve(),
 		editMessageReplyMarkup: () => Promise.resolve(),
 		reply: (text: string) => {
