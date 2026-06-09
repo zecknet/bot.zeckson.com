@@ -61,7 +61,7 @@ export const stopInstance = async (instanceId: string) => {
 
 export const ec2Handler = async (ctx: Context) => {
 	try {
-		const instances = await getInstances();
+		const instances = await getInstances()
 
 		if (instances.length === 0) {
 			await ctx.reply('No EC2 instances found.')
@@ -87,16 +87,24 @@ export const ec2Handler = async (ctx: Context) => {
 		}
 	} catch (error) {
 		console.error('EC2 Error:', error)
-		await ctx.reply(`Failed to fetch EC2 instances: ${error instanceof Error ? error.message : String(error)}`)
+		await ctx.reply(
+			`Failed to fetch EC2 instances: ${
+				error instanceof Error ? error.message : String(error)
+			}`,
+		)
 	}
 }
 
 aws.command('ec2', ec2Handler)
 
-export const callbackHandler = async (ctx: Context & { match: RegExpExecArray }) => {
+export const callbackHandler = async (
+	ctx: Context & { match: RegExpExecArray },
+) => {
 	const [, action, instanceId] = ctx.match
 	try {
-		await ctx.answerCallbackQuery({ text: `${action === 'start' ? 'Starting' : 'Stopping'} instance...` })
+		await ctx.answerCallbackQuery({
+			text: `${action === 'start' ? 'Starting' : 'Stopping'} instance...`,
+		})
 
 		if (action === 'start') {
 			await startInstance(instanceId)
@@ -105,13 +113,25 @@ export const callbackHandler = async (ctx: Context & { match: RegExpExecArray })
 		}
 
 		await ctx.editMessageReplyMarkup({ reply_markup: undefined })
-		await ctx.reply(`Instance \`${instanceId}\` ${action === 'start' ? 'starting' : 'stopping'}...`, { parse_mode: 'Markdown' })
+		await ctx.reply(
+			`Instance \`${instanceId}\` ${
+				action === 'start' ? 'starting' : 'stopping'
+			}...`,
+			{ parse_mode: 'Markdown' },
+		)
 	} catch (error) {
 		console.error(`EC2 ${action} Error:`, error)
-		await ctx.reply(`Failed to ${action} instance: ${error instanceof Error ? error.message : String(error)}`)
+		await ctx.reply(
+			`Failed to ${action} instance: ${
+				error instanceof Error ? error.message : String(error)
+			}`,
+		)
 	}
 }
 
-aws.callbackQuery(/^aws:(start|stop):(.+)$/, callbackHandler as unknown as (ctx: Context) => Promise<void>)
+aws.callbackQuery(
+	/^aws:(start|stop):(.+)$/,
+	callbackHandler as unknown as (ctx: Context) => Promise<void>,
+)
 
 export default aws

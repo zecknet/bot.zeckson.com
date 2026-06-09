@@ -15,7 +15,7 @@ export const auth = async (
 	const approvedIds = config.ADMIN_USER_IDS
 
 	// We can get messages like topic creation from ourselves
-	if (ctx.from?.is_bot ) {
+	if (ctx.from?.is_bot) {
 		// TODO: check that it's me, not other bot
 		return await next()
 	}

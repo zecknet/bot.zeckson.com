@@ -1,6 +1,10 @@
 import '../config.local.ts'
 
-import { CostExplorerClient, GetCostAndUsageCommand, GetCostForecastCommand, } from '@aws-sdk/client-cost-explorer'
+import {
+	CostExplorerClient,
+	GetCostAndUsageCommand,
+	GetCostForecastCommand,
+} from '@aws-sdk/client-cost-explorer'
 import { getConfig } from './aws.config.ts'
 
 const client = new CostExplorerClient(getConfig())

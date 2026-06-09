@@ -4,8 +4,7 @@ const topics = new Composer()
 
 // Handle Forum Topic Created
 topics.on('message:forum_topic_created', async (ctx) => {
-	const { name, icon_custom_emoji_id } =
-		ctx.message.forum_topic_created
+	const { name, icon_custom_emoji_id } = ctx.message.forum_topic_created
 	await ctx.reply(
 		`New topic created: ${name}${
 			icon_custom_emoji_id ? ` (Emoji: ${icon_custom_emoji_id})` : ''

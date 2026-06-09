@@ -68,9 +68,13 @@ const executeBotCommand = async (
 	if (!targetThreadId && ctx.chat) {
 		console.log('No target thread ID found. Get Thread name from prompt')
 		await ctx.replyWithDraft(`Creating topic: ${prompt}`)
-		const response = await request(`Get Thread name from prompt in one word: ${prompt}`)
+		const response = await request(
+			`Get Thread name from prompt in one word: ${prompt}`,
+		)
 		if (response.status === 'error') {
-			return ctx.reply(response.errorMessage ?? `Error: ${response.status}`)
+			return ctx.reply(
+				response.errorMessage ?? `Error: ${response.status}`,
+			)
 		}
 		const topic = await ctx.api.createForumTopic(
 			ctx.chat.id,

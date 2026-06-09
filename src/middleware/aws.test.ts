@@ -1,9 +1,21 @@
-import { DescribeInstancesCommand, EC2Client, Instance, StartInstancesCommand, StopInstancesCommand, } from '@aws-sdk/client-ec2'
+import {
+	DescribeInstancesCommand,
+	EC2Client,
+	Instance,
+	StartInstancesCommand,
+	StopInstancesCommand,
+} from '@aws-sdk/client-ec2'
 import { assertEquals } from '@std/assert'
 import { stub } from '@std/testing/mock'
 import { Context, InlineKeyboard } from 'grammy'
 import { initConfig } from '../config.ts'
-import { callbackHandler, ec2Handler, getInstances, startInstance, stopInstance, } from './aws.ts'
+import {
+	callbackHandler,
+	ec2Handler,
+	getInstances,
+	startInstance,
+	stopInstance,
+} from './aws.ts'
 
 // Mock config for testing
 initConfig({
@@ -99,7 +111,10 @@ Deno.test('ec2 command sends instance info', async () => {
 		return Promise.reject(new Error('Unknown command'))
 	})
 
-	const replies: { text: string; options?: { reply_markup: InlineKeyboard } }[] = []
+	const replies: {
+		text: string
+		options?: { reply_markup: InlineKeyboard }
+	}[] = []
 	const ctx = {
 		reply: (text: string, options?: { reply_markup: InlineKeyboard }) => {
 			replies.push({ text, options })
@@ -209,7 +224,10 @@ Deno.test('ec2 command handles error when fetching instances', async () => {
 	try {
 		await ec2Handler(ctx)
 		assertEquals(replies.length, 1)
-		assertEquals(replies[0].includes('Failed to fetch EC2 instances: AWS Error'), true)
+		assertEquals(
+			replies[0].includes('Failed to fetch EC2 instances: AWS Error'),
+			true,
+		)
 	} finally {
 		sendStub.restore()
 	}
@@ -234,7 +252,10 @@ Deno.test('callbackHandler handles error when starting instance', async () => {
 	try {
 		await callbackHandler(ctx)
 		assertEquals(replies.length, 1)
-		assertEquals(replies[0].includes('Failed to start instance: Start Error'), true)
+		assertEquals(
+			replies[0].includes('Failed to start instance: Start Error'),
+			true,
+		)
 	} finally {
 		sendStub.restore()
 	}

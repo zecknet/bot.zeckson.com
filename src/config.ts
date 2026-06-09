@@ -42,9 +42,11 @@ export const initConfig = (env: Record<string, string>): Config => {
 	const buildId = env['DENO_DEPLOY_BUILD_ID']
 	const suffix = buildId ? `-${buildId}` : ``
 
-	const host = isDeploy ?
-        `https://${env['DENO_DEPLOY_APP_SLUG']}${suffix}.${env['DENO_DEPLOY_ORG_SLUG']}.deno.net` :
-        undefined
+	const host = isDeploy
+		? `https://${env['DENO_DEPLOY_APP_SLUG']}${suffix}.${
+			env['DENO_DEPLOY_ORG_SLUG']
+		}.deno.net`
+		: undefined
 
 	_config = Object.freeze({
 		...DEFAULT,
