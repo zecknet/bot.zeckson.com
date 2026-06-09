@@ -44,26 +44,33 @@ export async function getDailyCosts() {
 }
 
 function getMonthRange() {
-	const now = new Date();
+	const now = new Date()
 
-	const start = new Date(now.getFullYear(), now.getMonth(), 1);
-	const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+	const start = new Date(now.getFullYear(), now.getMonth(), 1)
+	const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
 
 	return {
 		Start: formatDate(start),
 		End: formatDate(end),
-	};
+	}
 }
 
 export async function getMTDCost() {
 	const command = new GetCostAndUsageCommand({
 		TimePeriod: getMonthRange(),
-		Granularity: "MONTHLY",
-		Metrics: ["UnblendedCost"],
-	});
+		Granularity: 'MONTHLY',
+		Metrics: [
+			'UnblendedCost',
+			'BlendedCost',
+			'NetUnblendedCost',
+			'AmortizedCost',
+			'NetAmortizedCost',
+			'UsageQuantity',
+		],
+	})
 
-	const res = await client().send(command);
+	const res = await client().send(command)
 
 	const resultsByTime = res.ResultsByTime ?? []
-	return toUSD(resultsByTime[0]?.Total?.UnblendedCost);
+	return resultsByTime[0]?.Total
 }
