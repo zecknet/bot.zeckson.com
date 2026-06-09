@@ -1,24 +1,20 @@
 import '../config.local.ts'
 
-import {
-	CostExplorerClient,
-	GetCostAndUsageCommand,
-	GetCostForecastCommand,
-} from '@aws-sdk/client-cost-explorer'
+import { CostExplorerClient, GetCostAndUsageCommand, MetricValue, } from '@aws-sdk/client-cost-explorer'
 import { getConfig } from './aws.config.ts'
 
-const client = new CostExplorerClient(getConfig())
+const client = () => new CostExplorerClient(getConfig())
 
 // helper: format date YYYY-MM-DD
 function formatDate(d: Date) {
 	return d.toISOString().split('T')[0]
 }
 
-const toUSD = (value: number) =>
+const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) =>
 	new Intl.NumberFormat('en-US', {
 		style: 'currency',
-		currency: 'USD',
-	}).format(value)
+		currency: value.Unit,
+	}).format(Number(value.Amount))
 
 // TODAY + LAST 7 DAYS COST
 export async function getDailyCosts() {
@@ -35,33 +31,39 @@ export async function getDailyCosts() {
 		Metrics: ['UnblendedCost'],
 	})
 
-	const res = await client.send(command)
-
-	return res.ResultsByTime?.map((day) => ({
-		date: day.TimePeriod?.Start,
-		cost: toUSD(parseInt(day.Total?.UnblendedCost.Amount ?? ``, 10)),
-	}))
+	const explorerClient = client()
+	try {
+		const res = await explorerClient.send(command)
+		return res.ResultsByTime?.map((day) => ({
+			date: day.TimePeriod?.Start,
+			cost: toUSD(day.Total?.UnblendedCost),
+		}))
+	} finally {
+		explorerClient.destroy()
+	}
 }
 
-// FORECAST (next 30 days)
-export async function getForecast() {
-	const start = new Date()
-	const end = new Date()
-	end.setDate(start.getDate() + 1)
+function getMonthRange() {
+	const now = new Date();
 
-	const command = new GetCostForecastCommand({
-		TimePeriod: {
-			Start: formatDate(start),
-			End: formatDate(end),
-		},
-		Metric: 'UNBLENDED_COST',
-		Granularity: 'DAILY',
-	})
-
-	const res = await client.send(command)
+	const start = new Date(now.getFullYear(), now.getMonth(), 1);
+	const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
 	return {
-		predictedTomorrow: res.Total?.Amount,
-		unit: res.Total?.Unit,
-	}
+		Start: formatDate(start),
+		End: formatDate(end),
+	};
+}
+
+export async function getMTDCost() {
+	const command = new GetCostAndUsageCommand({
+		TimePeriod: getMonthRange(),
+		Granularity: "MONTHLY",
+		Metrics: ["UnblendedCost"],
+	});
+
+	const res = await client().send(command);
+
+	const resultsByTime = res.ResultsByTime ?? []
+	return toUSD(resultsByTime[0]?.Total?.UnblendedCost);
 }
