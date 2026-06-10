@@ -1,5 +1,3 @@
-import '../config.local.ts'
-
 import { CostExplorerClient, GetCostAndUsageCommand, MetricValue, } from '@aws-sdk/client-cost-explorer'
 import { getConfig } from './aws.config.ts'
 
