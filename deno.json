@@ -4,7 +4,7 @@
     "start": "deno run --allow-read --allow-net --allow-env server.ts",
     "predeploy": "deno run --allow-all --unstable-kv webhook.prod.ts",
     "predeploy:local": "deno run --allow-all --unstable-kv webhook.local.ts",
-    "test": "deno test --allow-env --allow-sys",
+    "test": "deno test --allow-env --allow-sys --allow-read --unstable-kv",
     "lint": "deno lint"
   },
   "imports": {
@@ -14,7 +14,8 @@
     "grammy": "npm:grammy@1.42.0",
     "replicate": "npm:replicate@1.4.0",
     "@grammyjs/parse-mode": "npm:@grammyjs/parse-mode@2.3.0",
-    "@aws-sdk/client-ec2": "npm:@aws-sdk/client-ec2@3.588.0"
+    "@aws-sdk/client-ec2": "npm:@aws-sdk/client-ec2@3.588.0",
+    "@aws-sdk/client-cost-explorer": "npm:@aws-sdk/client-cost-explorer@3.1064.0"
   },
   "vendor": true,
   "lock": {
