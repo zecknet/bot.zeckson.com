@@ -4,7 +4,7 @@
     "start": "deno run --allow-read --allow-net --allow-env server.ts",
     "predeploy": "deno run --allow-all --unstable-kv webhook.prod.ts",
     "predeploy:local": "deno run --allow-all --unstable-kv webhook.local.ts",
-    "test": "deno test --allow-env --allow-sys --unstable-kv",
+    "test": "deno test --allow-env --allow-sys --allow-read --unstable-kv",
     "lint": "deno lint"
   },
   "imports": {
