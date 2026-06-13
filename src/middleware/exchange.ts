@@ -1,10 +1,20 @@
 import { Composer, Context } from 'grammy'
 import { fmt, FormattedString } from '@grammyjs/parse-mode'
 import { Markdown } from '../finance/finance.md.ts'
+import { CommandComposer } from '../util/commands.ts'
 
 const split = (ctx: Context) => ctx.message?.text?.split(` `) ?? []
 
-const router = new Composer()
+const router = new Composer<Context>() as CommandComposer<Context>
+router.commands = [
+	{
+		command: 'exchange',
+		description: 'Calculate exchange rate (sent received)',
+	},
+	{ command: 'send', description: 'Calculate amount to send with commission' },
+	{ command: 'received', description: 'Calculate received amount with rate' },
+	{ command: 'final', description: 'Calculate final exchange amount and rate' },
+]
 
 router.command(`exchange`, (ctx) => {
 	const [_, sent, received] = split(ctx)

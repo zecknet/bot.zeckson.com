@@ -1,8 +1,15 @@
 import { Instance, } from '@aws-sdk/client-ec2'
 import { Composer, Context, InlineKeyboard } from 'grammy'
 import { getInstances, startInstance, stopInstance } from "../aws/ec2.ts"
+import { CommandComposer } from '../util/commands.ts'
 
-const aws = new Composer()
+const aws = new Composer<Context>() as CommandComposer<Context>
+
+const EC2 = { command: 'ec2', description: 'Manage AWS EC2 instances' }
+
+aws.commands = [
+	EC2,
+]
 
 const format = (ins: Instance): string => {
 	const nameTag = ins.Tags?.find((t) => t.Key === 'Name')?.Value
@@ -49,7 +56,7 @@ export const ec2Handler = async (ctx: Context) => {
 	}
 }
 
-aws.command('ec2', ec2Handler)
+aws.command(EC2.command, ec2Handler)
 
 export const callbackHandler = async (
 	ctx: Context & { match: RegExpExecArray },

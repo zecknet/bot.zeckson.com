@@ -1,8 +1,13 @@
-import { Composer, InlineKeyboard } from 'grammy'
+import { Composer, Context, InlineKeyboard } from 'grammy'
+import { CommandComposer } from '../util/commands.ts'
 
 const URL_PATTERN = /https?:\/\/[^\s]+/
 
-const demo = new Composer()
+const demo = new Composer<Context>() as CommandComposer<Context>
+demo.commands = [
+	{ command: 'start', description: 'Start the bot' },
+	{ command: 'help', description: 'Show help message' },
+]
 
 const keyboard = (data: string) =>
 	InlineKeyboard.from([[

@@ -1,8 +1,12 @@
 import { Composer, Context } from 'grammy'
 import { config } from '../config.ts'
 import { request } from '../replicate/request.ts'
+import { CommandComposer } from '../util/commands.ts'
 
-const replicate = new Composer()
+const replicate = new Composer<Context>() as CommandComposer<Context>
+replicate.commands = [
+	{ command: 'bot', description: 'Interact with Replicate AI' },
+]
 
 replicate.on('business_message', (ctx, next) => {
 	const message = ctx.businessMessage

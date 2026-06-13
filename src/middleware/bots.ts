@@ -4,8 +4,13 @@ import { config } from '../config.ts'
 import { BotRepository, ManagedBot } from '../repository/bot.repository.ts'
 import { getName } from '../util/user.ts'
 import { DenoStore } from '../store/denostore.ts'
+import { CommandComposer } from '../util/commands.ts'
 
-const bots = new Composer()
+const bots = new Composer() as CommandComposer<Context>
+bots.commands = [
+	{ command: 'addbot', description: 'Add a new managed bot' },
+	{ command: 'listbots', description: 'List all managed bots' },
+]
 
 const openStore = () => {
 	if (config.DENO_KV_URL) return Deno.openKv(config.DENO_KV_URL)

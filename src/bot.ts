@@ -9,21 +9,26 @@ import replicate from './middleware/replicate.ts'
 import bots from './middleware/bots.ts'
 import store from './middleware/store.ts'
 import topics from './middleware/topics.ts'
-import { setupBotCommands, setupBotInfo } from './util/commands.ts'
+import { setupBotCommands, setupBotInfo, BotMiddleware } from './util/commands.ts'
 
 const bot = new Bot(config.BOT_TOKEN)
 
 await setupBotInfo(bot)
-await setupBotCommands(bot)
 
-bot.use(log)
-bot.use(store)
-bot.use(auth)
-bot.use(bots)
-bot.use(aws)
-bot.use(topics)
-bot.use(replicate)
-bot.use(exchange)
-bot.use(demo)
+const middlewares: BotMiddleware[] = [
+	log,
+	store,
+	auth,
+	bots,
+	aws,
+	topics,
+	replicate,
+	exchange,
+	demo,
+]
+
+await setupBotCommands(bot, middlewares)
+
+middlewares.forEach((m) => bot.use(m))
 
 export { bot }

@@ -1,6 +1,10 @@
-import { Composer } from 'grammy'
+import { Composer, Context } from 'grammy'
+import { CommandComposer } from '../util/commands.ts'
 
-const topics = new Composer()
+const topics = new Composer<Context>() as CommandComposer<Context>
+topics.commands = [
+	{ command: 'topic', description: 'Get current topic information' },
+]
 
 // Handle Forum Topic Created
 topics.on('message:forum_topic_created', async (ctx) => {
