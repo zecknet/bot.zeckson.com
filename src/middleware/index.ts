@@ -1,5 +1,5 @@
 import { Bot } from "grammy"
-import { BotMiddleware, setupBotCommands, setupBotInfo } from "../util/commands.ts"
+import { BotMiddleware, setupBotCommands } from "../util/commands.ts"
 
 import { auth } from "./filters/auth.ts"
 import { log } from "./filters/log.ts"
@@ -20,9 +20,9 @@ const registerFilters = (bot: Bot) => {
 const routes: BotMiddleware[] = [
     bots,
     aws,
-    topics,
+    // topics,
     replicate,
-    exchange,
+    // exchange,
     help,
 ]
 
@@ -30,7 +30,7 @@ const registerRoutes = async (bot: Bot) => {
     routes.forEach((m) => bot.use(m))
 
     await setupBotCommands(bot, routes)
-    await setupBotInfo(bot)
+    // await setupBotInfo(bot)
 }
 
 export const setup = async (bot: Bot) => {
