@@ -9,8 +9,12 @@ import replicate from './middleware/replicate.ts'
 import bots from './middleware/bots.ts'
 import store from './middleware/store.ts'
 import topics from './middleware/topics.ts'
+import { setupBotCommands, setupBotInfo } from './util/commands.ts'
 
 const bot = new Bot(config.BOT_TOKEN)
+
+await setupBotInfo(bot)
+await setupBotCommands(bot)
 
 bot.use(log)
 bot.use(store)

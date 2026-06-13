@@ -35,7 +35,6 @@ const executeBotCommand = async (
 	prompt: string,
 ) => {
 	const businessConnectionId = ctx.businessConnectionId
-	let targetThreadId = ctx.message?.message_thread_id
 
 	if (ctx.from?.id === Number(config.ROOT_USER_ID)) {
 		console.log(
@@ -65,31 +64,10 @@ const executeBotCommand = async (
 		)
 	}
 
-	if (!targetThreadId && ctx.chat) {
-		console.log('No target thread ID found. Get Thread name from prompt')
-		await ctx.replyWithDraft(`Creating topic: ${prompt}`)
-		const response = await request(
-			`Get Thread name from prompt in one word: ${prompt}`,
-		)
-		if (response.status === 'error') {
-			return ctx.reply(
-				response.errorMessage ?? `Error: ${response.status}`,
-			)
-		}
-		const topic = await ctx.api.createForumTopic(
-			ctx.chat.id,
-			response.data ?? 'Unknown',
-		)
-		await ctx.replyWithDraft(`Topic created: ${prompt}`)
-		targetThreadId = topic.message_thread_id
-	}
-
 	await ctx.replyWithDraft(`Generating response: ${prompt}`)
 	const response = await request(prompt)
 
-	return ctx.reply(response.data ?? response.errorMessage, {
-		message_thread_id: targetThreadId,
-	})
+	return ctx.reply(response.data ?? response.errorMessage)
 }
 replicate.command('bot', (ctx) => executeBotCommand(ctx, ctx.match))
 
