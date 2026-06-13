@@ -1,7 +1,7 @@
 import { Instance, } from '@aws-sdk/client-ec2'
 import { Composer, Context, InlineKeyboard } from 'grammy'
-import { getInstances, startInstance, stopInstance } from "../aws/ec2.ts"
-import { CommandComposer } from '../util/commands.ts'
+import { getInstances, startInstance, stopInstance } from "../../aws/ec2.ts"
+import { CommandComposer } from '../../util/commands.ts'
 
 const aws = new Composer<Context>() as CommandComposer<Context>
 

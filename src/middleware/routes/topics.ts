@@ -1,5 +1,5 @@
 import { Composer, Context } from 'grammy'
-import { CommandComposer } from '../util/commands.ts'
+import { CommandComposer } from '../../util/commands.ts'
 
 const topics = new Composer<Context>() as CommandComposer<Context>
 const TOPIC = { command: 'topic', description: 'Get current topic information' }

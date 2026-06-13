@@ -1,10 +1,10 @@
 import { fmt, FormattedString } from '@grammyjs/parse-mode'
 import { Composer, Context, InlineKeyboard } from 'grammy'
-import { config } from '../config.ts'
-import { BotRepository, ManagedBot } from '../repository/bot.repository.ts'
-import { DenoStore } from '../store/denostore.ts'
-import { CommandComposer } from '../util/commands.ts'
-import { getName } from '../util/user.ts'
+import { config } from '../../config.ts'
+import { BotRepository, ManagedBot } from '../../repository/bot.repository.ts'
+import { DenoStore } from '../../store/denostore.ts'
+import { CommandComposer } from '../../util/commands.ts'
+import { getName } from '../../util/user.ts'
 
 const bots = new Composer() as CommandComposer<Context>
 

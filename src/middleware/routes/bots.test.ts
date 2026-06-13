@@ -1,7 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert'
-import { addBot } from '../middleware/bots.ts'
-import { BotRepository } from '../repository/bot.repository.ts'
-import { DenoStore } from '../store/denostore.ts'
+import { addBot } from './bots.ts'
+import { BotRepository } from '../../repository/bot.repository.ts'
+import { DenoStore } from '../../store/denostore.ts'
 
 Deno.test('addBot - business logic', async () => {
 	const kv = await Deno.openKv(':memory:')

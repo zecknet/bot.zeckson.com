@@ -1,4 +1,4 @@
-import { Api, Bot, Composer, Context, NextFunction } from 'grammy'
+import { Api, Bot, Composer, Context, Middleware } from 'grammy'
 
 const BOT_NAME = 'Zeckson Bot'
 
@@ -8,8 +8,7 @@ export interface CommandComposer<C extends Context> extends Composer<C> {
 
 export type BotMiddleware =
 	| CommandComposer<Context>
-	| Composer<Context>
-	| ((ctx: Context, next: NextFunction) => Promise<void>)
+	| Middleware
 
 export const setupBotCommands = async (
 	bot: Bot | Api,
@@ -20,7 +19,9 @@ export const setupBotCommands = async (
 		.flatMap((m) => {
 			if (typeof m === 'object' && m !== null && 'commands' in m) {
 				const cm = m as CommandComposer<Context>
-				return cm.commands && Array.isArray(cm.commands) ? cm.commands : []
+				return cm.commands && Array.isArray(cm.commands)
+					? cm.commands
+					: []
 			}
 			return []
 		})

@@ -1,7 +1,7 @@
 import { fmt, FormattedString } from '@grammyjs/parse-mode'
 import { Composer, Context } from 'grammy'
-import { Markdown } from '../finance/finance.md.ts'
-import { CommandComposer } from '../util/commands.ts'
+import { Markdown } from '../../finance/finance.md.ts'
+import { CommandComposer } from '../../util/commands.ts'
 
 const split = (ctx: Context): string[] => ctx.message?.text?.split(` `) ?? []
 

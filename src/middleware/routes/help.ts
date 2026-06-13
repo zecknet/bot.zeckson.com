@@ -1,5 +1,5 @@
 import { Composer, Context, InlineKeyboard } from 'grammy'
-import { CommandComposer } from '../util/commands.ts'
+import { CommandComposer } from '../../util/commands.ts'
 
 const URL_PATTERN = /https?:\/\/[^\s]+/
 

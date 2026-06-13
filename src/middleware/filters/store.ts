@@ -1,6 +1,6 @@
 import { Context } from 'grammy'
-import { DenoStore } from '../store/denostore.ts'
-import { config } from '../config.ts'
+import { DenoStore } from '../../store/denostore.ts'
+import { config } from '../../config.ts'
 
 const openStore = () => {
 	if (config.DENO_KV_URL) return Deno.openKv(config.DENO_KV_URL)

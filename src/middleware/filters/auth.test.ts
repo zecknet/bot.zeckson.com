@@ -1,6 +1,6 @@
 import { assert } from '@std/assert'
 import { Context } from 'grammy'
-import { initConfig } from '../config.ts'
+import { initConfig } from '../../config.ts'
 import { auth } from './auth.ts'
 
 // Mock config for testing
