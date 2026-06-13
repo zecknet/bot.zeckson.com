@@ -6,7 +6,9 @@ const openStore = () => {
 	return Deno.openKv(':memory:')
 }
 
-Deno.test('BotRepository - save and get bot', async () => {
+Deno.test({
+	name: 'BotRepository - save and get bot',
+}, async () => {
 	const kv = await openStore()
 	const store = new DenoStore(kv)
 	const repo = new BotRepository(store)

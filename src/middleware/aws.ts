@@ -1,62 +1,16 @@
-import {
-	DescribeInstancesCommand,
-	EC2Client,
-	Instance,
-	StartInstancesCommand,
-	StopInstancesCommand,
-} from '@aws-sdk/client-ec2'
+import { Instance, } from '@aws-sdk/client-ec2'
 import { Composer, Context, InlineKeyboard } from 'grammy'
-import { config } from '../config.ts'
+import { getInstances, startInstance, stopInstance } from "../aws/ec2.ts"
 
 const aws = new Composer()
 
-const getEC2Client = () => {
-	const accessKeyId = config.AWS_ACCESS_KEY_ID
-	const secretAccessKey = config.AWS_SECRET_ACCESS_KEY
-	const region = config.AWS_REGION
-
-	if (!accessKeyId || !secretAccessKey) {
-		throw new Error('AWS credentials are not configured')
-	}
-
-	return new EC2Client({
-		region,
-		credentials: {
-			accessKeyId,
-			secretAccessKey,
-		},
-	})
-}
-
-const toString = (ins: Instance): string => {
+const format = (ins: Instance): string => {
 	const nameTag = ins.Tags?.find((t) => t.Key === 'Name')?.Value
 	const name = nameTag ? `*${nameTag}*` : '`unnamed`'
 	const id = `\`${ins.InstanceId}\``
 	const state = ins.State?.Name || 'unknown'
 	const type = ins.InstanceType || 'unknown'
 	return `${name} (${id})\nType: ${type}\nState: ${state}`
-}
-
-export const getInstances = async (): Promise<Instance[]> => {
-	const client = getEC2Client()
-	const command = new DescribeInstancesCommand({})
-	const response = await client.send(command)
-
-	return response.Reservations?.flatMap(
-		(r) => r.Instances || [],
-	) || []
-}
-
-export const startInstance = async (instanceId: string) => {
-	const client = getEC2Client()
-	const command = new StartInstancesCommand({ InstanceIds: [instanceId] })
-	return await client.send(command)
-}
-
-export const stopInstance = async (instanceId: string) => {
-	const client = getEC2Client()
-	const command = new StopInstancesCommand({ InstanceIds: [instanceId] })
-	return await client.send(command)
 }
 
 export const ec2Handler = async (ctx: Context) => {
@@ -69,7 +23,7 @@ export const ec2Handler = async (ctx: Context) => {
 		}
 
 		for (const ins of instances) {
-			const text = toString(ins)
+			const text = format(ins)
 			const keyboard = new InlineKeyboard()
 			const state = ins.State?.Name
 			const id = ins.InstanceId
