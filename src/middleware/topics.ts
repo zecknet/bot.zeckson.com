@@ -2,8 +2,9 @@ import { Composer, Context } from 'grammy'
 import { CommandComposer } from '../util/commands.ts'
 
 const topics = new Composer<Context>() as CommandComposer<Context>
+const TOPIC = { command: 'topic', description: 'Get current topic information' }
 topics.commands = [
-	{ command: 'topic', description: 'Get current topic information' },
+	TOPIC,
 ]
 
 // Handle Forum Topic Created
@@ -18,7 +19,7 @@ topics.on('message:forum_topic_created', async (ctx) => {
 
 // Example command that only works in a specific topic (if needed)
 // Or just general handling of topic-related messages
-topics.command('topic', async (ctx) => {
+topics.command(TOPIC.command, async (ctx) => {
 	const threadId = ctx.message?.message_thread_id
 	if (threadId) {
 		await ctx.reply(`This message is in a topic with ID: ${threadId}`)

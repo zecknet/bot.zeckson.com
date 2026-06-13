@@ -4,8 +4,9 @@ import { request } from '../replicate/request.ts'
 import { CommandComposer } from '../util/commands.ts'
 
 const replicate = new Composer<Context>() as CommandComposer<Context>
+const BOT = { command: 'bot', description: 'Interact with Replicate AI' }
 replicate.commands = [
-	{ command: 'bot', description: 'Interact with Replicate AI' },
+	BOT,
 ]
 
 replicate.on('business_message', (ctx, next) => {
@@ -73,6 +74,6 @@ const executeBotCommand = async (
 
 	return ctx.reply(response.data ?? response.errorMessage)
 }
-replicate.command('bot', (ctx) => executeBotCommand(ctx, ctx.match))
+replicate.command(BOT.command, (ctx) => executeBotCommand(ctx, ctx.match))
 
 export default replicate
