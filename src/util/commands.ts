@@ -26,7 +26,7 @@ export const setupBotCommands = async (
 			return []
 		})
 
-	await api.setMyCommands(commands)
+	await api.setMyCommands(commands, { scope: { type: 'all_private_chats' } })
 }
 
 export const setupBotInfo = async (bot: Bot | Api) => {
