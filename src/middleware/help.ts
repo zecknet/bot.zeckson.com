@@ -3,10 +3,12 @@ import { CommandComposer } from '../util/commands.ts'
 
 const URL_PATTERN = /https?:\/\/[^\s]+/
 
-const demo = new Composer<Context>() as CommandComposer<Context>
-demo.commands = [
-	{ command: 'start', description: 'Start the bot' },
-	{ command: 'help', description: 'Show help message' },
+const help = new Composer<Context>() as CommandComposer<Context>
+const START = { command: 'start', description: 'Start the bot' }
+const HELP = { command: 'help', description: 'Show help message' }
+help.commands = [
+	START,
+	HELP,
 ]
 
 const keyboard = (data: string) =>
@@ -20,10 +22,10 @@ const keyboard = (data: string) =>
 		),
 	]])
 
-demo.command(`start`, (ctx) => ctx.reply('Hello'))
+help.command(START.command, (ctx) => ctx.reply('Hello'))
 
-demo.command(`help`, (ctx) => ctx.reply('Help message'))
-demo.on(
+help.command(HELP.command, (ctx) => ctx.reply('Help message'))
+help.on(
 	'message',
 	async (ctx) => {
 		const messageText = ctx.message.text
@@ -36,6 +38,6 @@ demo.on(
 		await ctx.reply(messageText, { reply_markup: keyboard(url) })
 	},
 )
-demo.callbackQuery('delete', (ctx) => ctx.deleteMessage())
+help.callbackQuery('delete', (ctx) => ctx.deleteMessage())
 
-export default demo
+export default help

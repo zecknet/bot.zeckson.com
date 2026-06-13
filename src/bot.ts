@@ -2,7 +2,7 @@ import { Bot } from 'grammy'
 import { config } from './config.ts'
 import { auth } from './middleware/auth.ts'
 import aws from './middleware/aws.ts'
-import demo from './middleware/demo.ts'
+import help from './middleware/help.ts'
 import exchange from './middleware/exchange.ts'
 import { log } from './middleware/log.ts'
 import replicate from './middleware/replicate.ts'
@@ -24,7 +24,7 @@ const middlewares: BotMiddleware[] = [
 	topics,
 	replicate,
 	exchange,
-	demo,
+	help,
 ]
 
 await setupBotCommands(bot, middlewares)
