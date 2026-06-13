@@ -2,14 +2,18 @@ import { fmt, FormattedString } from '@grammyjs/parse-mode'
 import { Composer, Context, InlineKeyboard } from 'grammy'
 import { config } from '../config.ts'
 import { BotRepository, ManagedBot } from '../repository/bot.repository.ts'
-import { getName } from '../util/user.ts'
 import { DenoStore } from '../store/denostore.ts'
 import { CommandComposer } from '../util/commands.ts'
+import { getName } from '../util/user.ts'
 
 const bots = new Composer() as CommandComposer<Context>
+
+const ADD_BOT = { command: 'addbot', description: 'Add a new managed bot' }
+const LIST_BOTS = { command: 'listbots', description: 'List all managed bots' }
+
 bots.commands = [
-	{ command: 'addbot', description: 'Add a new managed bot' },
-	{ command: 'listbots', description: 'List all managed bots' },
+	ADD_BOT,
+	LIST_BOTS,
 ]
 
 const openStore = () => {
@@ -77,7 +81,7 @@ ${FormattedString.b('Token:')} ${FormattedString.code(token)}`
 	}
 }
 
-bots.command('addbot', async (ctx) => {
+bots.command(ADD_BOT.command, async (ctx) => {
 	const userId = ctx.from?.id
 	if (!userId || !config.ADMIN_USER_IDS.includes(userId.toString())) {
 		return
@@ -168,7 +172,7 @@ ${FormattedString.b('Token:')} ${FormattedString.code(token)}`
 	}
 })
 
-bots.command('listbots', async (ctx) => {
+bots.command(LIST_BOTS.command, async (ctx) => {
 	const userId = ctx.from?.id
 	if (!userId || !config.ADMIN_USER_IDS.includes(userId.toString())) {
 		return
