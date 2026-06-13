@@ -1,29 +1,42 @@
-import { Composer, Context } from 'grammy'
 import { fmt, FormattedString } from '@grammyjs/parse-mode'
+import { Composer, Context } from 'grammy'
 import { Markdown } from '../finance/finance.md.ts'
 import { CommandComposer } from '../util/commands.ts'
 
-const split = (ctx: Context) => ctx.message?.text?.split(` `) ?? []
+const split = (ctx: Context): string[] => ctx.message?.text?.split(` `) ?? []
 
 const router = new Composer<Context>() as CommandComposer<Context>
+const EXCHANGE = {
+	command: 'exchange',
+	description: 'Calculate exchange rate (sent received)',
+}
+const SEND = {
+	command: 'send',
+	description: 'Calculate amount to send with commission',
+}
+const RECEIVED = {
+	command: 'received',
+	description: 'Calculate received amount with rate',
+}
+const FINALIZE = {
+	command: 'final',
+	description: 'Calculate final exchange amount and rate',
+}
 router.commands = [
-	{
-		command: 'exchange',
-		description: 'Calculate exchange rate (sent received)',
-	},
-	{ command: 'send', description: 'Calculate amount to send with commission' },
-	{ command: 'received', description: 'Calculate received amount with rate' },
-	{ command: 'final', description: 'Calculate final exchange amount and rate' },
+	EXCHANGE,
+	SEND,
+	RECEIVED,
+	FINALIZE,
 ]
 
-router.command(`exchange`, (ctx) => {
+router.command(EXCHANGE.command, (ctx) => {
 	const [_, sent, received] = split(ctx)
 	const message = fmt`Поменял: ${sent} (${received}). Курс: ${
 		FormattedString.bold(Markdown.rate(Number(sent), Number(received)))
 	}`
 	return ctx.reply(message.text, { entities: message.entities })
 })
-router.command(`send`, (ctx) => {
+router.command(SEND.command, (ctx) => {
 	const [_, sent] = split(ctx)
 	const commission = 1
 	const message = fmt`Отправил: ${
@@ -33,14 +46,14 @@ router.command(`send`, (ctx) => {
 	}`
 	return ctx.reply(message.text, { entities: message.entities })
 })
-router.command(`received`, (ctx) => {
+router.command(RECEIVED.command, (ctx) => {
 	const [_, sent, received] = split(ctx)
 	const message = fmt`Обмен USDT -> LKR: ${sent} (${received}). Курс: ${
 		FormattedString.bold(Markdown.rate(Number(received), Number(sent)))
 	}`
 	return ctx.reply(message.text, { entities: message.entities })
 })
-router.command(`final`, (ctx) => {
+router.command(FINALIZE.command, (ctx) => {
 	const [_, sent, received] = split(ctx)
 	const message =
 		fmt`Обмен RUB -> LKR (c учётом всех комиссий): ${sent} -> ${received}. Курс: ${
