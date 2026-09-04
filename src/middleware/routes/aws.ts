@@ -1,6 +1,6 @@
-import { Instance, } from '@aws-sdk/client-ec2'
+import { Instance } from '@aws-sdk/client-ec2'
 import { Composer, Context, InlineKeyboard } from 'grammy'
-import { getInstances, startInstance, stopInstance } from "../../aws/ec2.ts"
+import { getInstances, startInstance, stopInstance } from '../../aws/ec2.ts'
 import { CommandComposer } from '../../util/commands.ts'
 
 const aws = new Composer<Context>() as CommandComposer<Context>
@@ -20,7 +20,7 @@ const format = (ins: Instance): string => {
 	return `${name} (${id})
 	Type: ${type}
 	State: ${state}
-	Public IP: ${ins.PublicIpAddress}`
+	Public IP: \`${ins.PublicIpAddress}\``
 }
 
 export const ec2Handler = async (ctx: Context) => {
@@ -76,12 +76,11 @@ export const callbackHandler = async (
 			await stopInstance(instanceId)
 		}
 
-		await ctx.editMessageReplyMarkup({ reply_markup: undefined })
-		await ctx.reply(
+		await ctx.editMessageText(
 			`Instance \`${instanceId}\` ${
 				action === 'start' ? 'starting' : 'stopping'
 			}...`,
-			{ parse_mode: 'Markdown' },
+			{ parse_mode: 'Markdown', reply_markup: undefined },
 		)
 	} catch (error) {
 		console.error(`EC2 ${action} Error:`, error)
