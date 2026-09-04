@@ -17,8 +17,6 @@ const format = (ins: Instance): string => {
 	const id = `\`${ins.InstanceId}\``
 	const state = ins.State?.Name || 'unknown'
 	const type = ins.InstanceType || 'unknown'
-	console.debug(`Instance: `, ins)
-	console.dir(ins)
 	return `${name} (${id})
 	Type: ${type}
 	State: ${state}
