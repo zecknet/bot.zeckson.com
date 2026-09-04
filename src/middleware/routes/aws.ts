@@ -17,6 +17,7 @@ const format = (ins: Instance): string => {
 	const id = `\`${ins.InstanceId}\``
 	const state = ins.State?.Name || 'unknown'
 	const type = ins.InstanceType || 'unknown'
+	console.log(`Instance: `, ins)
 	return `${name} (${id})
 	Type: ${type}
 	State: ${state}
@@ -70,7 +71,7 @@ export const callbackHandler = async (
 			text: `${action === 'start' ? 'Starting' : 'Stopping'} instance...`,
 		})
 
-		let instance: Instance | null = null
+		let instance: Instance | undefined = undefined
 		if (action === 'start') {
 			instance = await startInstance(instanceId)
 		} else {
