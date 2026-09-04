@@ -1,4 +1,4 @@
-import { Instance } from '@aws-sdk/client-ec2'
+import { Instance, InstanceStateName } from '@aws-sdk/client-ec2'
 import { Composer, Context, InlineKeyboard } from 'grammy'
 import { getInstances, startInstance, stopInstance } from '../../aws/ec2.ts'
 import { CommandComposer } from '../../util/commands.ts'
@@ -80,7 +80,11 @@ export const callbackHandler = async (
 		const stateName = action === 'start' ? 'starting' : 'stopping'
 		let message = `Instance \`${instanceId}\` ${stateName}...`
 
-		message = instance ? format(instance) : message
+		if (instance) {
+			instance.State = { Name: action === 'start' ? InstanceStateName.pending : InstanceStateName.stopping}
+			message = format(instance)
+		}
+
 		await ctx.editMessageText(
 			message,
 			{ parse_mode: 'Markdown', reply_markup: undefined },
