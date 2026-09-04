@@ -30,7 +30,9 @@ export const startInstance = async (
 	return response.StartingInstances?.[0]
 }
 
-export const stopInstance = async (instanceId: string): Promise<Instance | undefined> => {
+export const stopInstance = async (
+	instanceId: string,
+): Promise<Instance | undefined> => {
 	const client = getEC2Client()
 	const command = new StopInstancesCommand({ InstanceIds: [instanceId] })
 	const req = await client.send(command)

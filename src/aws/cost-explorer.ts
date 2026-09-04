@@ -1,4 +1,8 @@
-import { CostExplorerClient, GetCostAndUsageCommand, MetricValue, } from '@aws-sdk/client-cost-explorer'
+import {
+	CostExplorerClient,
+	GetCostAndUsageCommand,
+	MetricValue,
+} from '@aws-sdk/client-cost-explorer'
 import { getConfig } from './aws.config.ts'
 
 const client = () => new CostExplorerClient(getConfig())

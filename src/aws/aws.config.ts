@@ -1,4 +1,4 @@
-import { EC2ClientConfig } from "@aws-sdk/client-ec2"
+import { EC2ClientConfig } from '@aws-sdk/client-ec2'
 import { config } from '../config.ts'
 
 export const getConfig = (extra: object = {}): EC2ClientConfig => {
