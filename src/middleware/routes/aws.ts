@@ -17,7 +17,8 @@ const format = (ins: Instance): string => {
 	const id = `\`${ins.InstanceId}\``
 	const state = ins.State?.Name || 'unknown'
 	const type = ins.InstanceType || 'unknown'
-	console.log(`Instance: `, ins)
+	console.debug(`Instance: `, ins)
+	console.dir(ins)
 	return `${name} (${id})
 	Type: ${type}
 	State: ${state}
@@ -78,9 +79,12 @@ export const callbackHandler = async (
 			instance = await stopInstance(instanceId)
 		}
 
-		let message = `Instance \`${instanceId}\` ${
-			action === 'start' ? 'starting' : 'stopping'
-		}...`
+		const stateName = action === 'start' ? 'starting' : 'stopping'
+		let message = `Instance \`${instanceId}\` ${stateName}...`
+
+		if (instance) {
+			instance.State = { Name: stateName }
+		}
 
 		message = instance ? format(instance) : message
 		await ctx.editMessageText(
