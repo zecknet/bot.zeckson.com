@@ -17,7 +17,10 @@ const format = (ins: Instance): string => {
 	const id = `\`${ins.InstanceId}\``
 	const state = ins.State?.Name || 'unknown'
 	const type = ins.InstanceType || 'unknown'
-	return `${name} (${id})\nType: ${type}\nState: ${state}`
+	return `${name} (${id})
+	Type: ${type}
+	State: ${state}
+	Public IP: ${ins.PublicIpAddress}`
 }
 
 export const ec2Handler = async (ctx: Context) => {
