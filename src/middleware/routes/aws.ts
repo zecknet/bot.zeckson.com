@@ -70,16 +70,20 @@ export const callbackHandler = async (
 			text: `${action === 'start' ? 'Starting' : 'Stopping'} instance...`,
 		})
 
+		let instance: Instance | null = null
 		if (action === 'start') {
-			await startInstance(instanceId)
+			instance = await startInstance(instanceId)
 		} else {
-			await stopInstance(instanceId)
+			instance = await stopInstance(instanceId)
 		}
 
+		let message = `Instance \`${instanceId}\` ${
+			action === 'start' ? 'starting' : 'stopping'
+		}...`
+
+		message = instance ? format(instance) : message
 		await ctx.editMessageText(
-			`Instance \`${instanceId}\` ${
-				action === 'start' ? 'starting' : 'stopping'
-			}...`,
+			message,
 			{ parse_mode: 'Markdown', reply_markup: undefined },
 		)
 	} catch (error) {

@@ -21,14 +21,18 @@ export const getInstances = async (): Promise<Instance[]> => {
 	) || []
 }
 
-export const startInstance = async (instanceId: string) => {
+export const startInstance = async (
+	instanceId: string,
+): Promise<Instance | undefined> => {
 	const client = getEC2Client()
 	const command = new StartInstancesCommand({ InstanceIds: [instanceId] })
-	return await client.send(command)
+	const response = await client.send(command)
+	return response.StartingInstances?.[0]
 }
 
-export const stopInstance = async (instanceId: string) => {
+export const stopInstance = async (instanceId: string): Promise<Instance | undefined> => {
 	const client = getEC2Client()
 	const command = new StopInstancesCommand({ InstanceIds: [instanceId] })
-	return await client.send(command)
+	const req = await client.send(command)
+	return req.StoppingInstances?.[0]
 }
