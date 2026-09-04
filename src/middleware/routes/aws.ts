@@ -82,10 +82,6 @@ export const callbackHandler = async (
 		const stateName = action === 'start' ? 'starting' : 'stopping'
 		let message = `Instance \`${instanceId}\` ${stateName}...`
 
-		if (instance) {
-			instance.State = { Name: stateName }
-		}
-
 		message = instance ? format(instance) : message
 		await ctx.editMessageText(
 			message,
