@@ -1,3 +1,4 @@
+import { Instance } from '@aws-sdk/client-ec2'
 import { Context, InlineKeyboard } from 'grammy'
 import { getInstances, startInstance, stopInstance } from '../ec2.ts'
 
@@ -68,9 +69,7 @@ export const callbackHandler = async (
 
 		if (instance) {
 			instance.State = {
-				Name: action === 'start'
-					? InstanceStateName.pending
-					: InstanceStateName.stopping,
+				Name: action === 'start' ? 'pending' : 'stopping',
 			}
 			message = format(instance)
 		}
