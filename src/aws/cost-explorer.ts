@@ -7,13 +7,16 @@ import {
 } from '@aws-sdk/client-cost-explorer'
 import { getConfig } from './aws.config.ts'
 
-export const SERVICE_TYPE: Record<string, string[]> = {
+export const COST_SERVICE_MAPPING = {
 	'Amazon Bedrock': ['Amazon Bedrock'],
 	'EC2': [
-		'Amazon Elastic Compute Cloud - Compute', // : Tracks literal per-second server instance runtime fees
+		'Amazon Elastic Compute Cloud - Compute', // Tracks literal per-second server instance runtime fees
 		'EC2 - Other', // storage, ipv4, etc...
 	],
-}
+} as const;
+
+// Optional: Create a type out of your map keys ('Amazon Bedrock' | 'EC2')
+export type TrackedService = keyof typeof COST_SERVICE_MAPPING;
 
 const client = () => new CostExplorerClient(getConfig())
 
@@ -68,7 +71,7 @@ export const costToDays = (
 
 // TODAY + LAST 7 DAYS COST (Excluding Credits)
 export async function getDailyCosts(
-	services: string | string[] = SERVICE_TYPE["Amazon Bedrock"],
+	...services: TrackedService[]
 ): Promise<ResultByTime[]> {
 	const end = new Date()
 	const start = new Date()
@@ -81,7 +84,7 @@ export async function getDailyCosts(
 		},
 		Granularity: 'DAILY',
 		Metrics: ['UnblendedCost'],
-		Filter: createGrossCostFilter(services),
+		Filter: createGrossCostFilter(services.flatMap((service) => COST_SERVICE_MAPPING[service])),
 	})
 
 	const explorerClient = client()

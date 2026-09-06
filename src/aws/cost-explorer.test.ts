@@ -1,5 +1,5 @@
 import '../config.local.ts'
-import { getDailyCosts, getMTDCost, toUSD, SERVICE_TYPE } from './cost-explorer.ts'
+import { getDailyCosts, getMTDCost, toUSD } from './cost-explorer.ts'
 import { printDayCosts } from './routes/cost-handler.ts'
 
 Deno.test({
@@ -12,7 +12,7 @@ Deno.test({
 		net: true,
 	},
 	async fn() {
-		const costs = await getDailyCosts(SERVICE_TYPE['EC2'])
+		const costs = await getDailyCosts('EC2')
 		console.log(printDayCosts(costs))
 		const mtdCosts = await getMTDCost()
 		const message =

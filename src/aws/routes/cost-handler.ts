@@ -7,8 +7,14 @@ export const printDayCosts = (period: ResultByTime[]) =>
 		period.map(costToDay).map((it) => `${it.date}: ${it.cost}`).join('\n')
 	}`
 
-export const costHandler = async (ctx: Context) => {
-	const costs = await getDailyCosts()
+export const bedrockWeeklyCosts = async (ctx: Context) => {
+	const costs = await getDailyCosts('Amazon Bedrock')
+	return ctx.reply(`Amazon Bedrock last 7 days:
+    ${printDayCosts(costs)}`)
+}
+
+export const ec2WeeklyCosts = async (ctx: Context) => {
+	const costs = await getDailyCosts('EC2')
 	return ctx.reply(`Amazon Bedrock last 7 days:
     ${printDayCosts(costs)}`)
 }
