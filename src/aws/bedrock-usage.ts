@@ -1,19 +1,18 @@
 import { GetCostAndUsageCommand } from '@aws-sdk/client-cost-explorer'
-import { costExplorer, formatDate, formatNum } from './cost-explorer.ts'
+import { costExplorer, formatDate } from './cost-explorer.ts'
 
 const client = costExplorer
 
 export interface TokenBreakdown {
-    usageType: string
-    tokenCount: number
+	usageType: string
+	tokenCount: number
 }
 
 export interface DailyTokenData {
-    date: string
-    totalTokens: number
-    breakdown: TokenBreakdown[]
+	date: string
+	totalTokens: number
+	breakdown: TokenBreakdown[]
 }
-
 
 // Token usage tracker function
 export async function getTokenUsage(

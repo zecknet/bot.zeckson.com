@@ -1,4 +1,4 @@
-import { getTokenUsage } from "./bedrock-usage.ts"
+import { getTokenUsage } from './bedrock-usage.ts'
 import { getDailyCosts, getMTDCost, toUSD } from './cost-explorer.ts'
 import { formatTokenUsageRaw, printDayCosts } from './routes/cost-handler.ts'
 

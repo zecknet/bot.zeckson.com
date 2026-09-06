@@ -1,6 +1,6 @@
 import { ResultByTime } from '@aws-sdk/client-cost-explorer'
 import { Context } from 'grammy'
-import { DailyTokenData, getTokenUsage } from "../bedrock-usage.ts"
+import { DailyTokenData, getTokenUsage } from '../bedrock-usage.ts'
 import { costToDay, formatNum, getDailyCosts } from '../cost-explorer.ts'
 
 export const printDayCosts = (period: ResultByTime[]) =>
@@ -22,7 +22,10 @@ export const ec2WeeklyCosts = async (ctx: Context) => {
 
 export const formatTokenUsageRaw = (dayData: DailyTokenData): string => {
 	// Dynamically calculate total from the array items
-	const actualTotal = dayData.breakdown.reduce((sum, item) => sum + item.tokenCount, 0)
+	const actualTotal = dayData.breakdown.reduce(
+		(sum, item) => sum + item.tokenCount,
+		0,
+	)
 
 	let message = `📅 *Date:* \`${dayData.date}\`\n`
 	message += `📊 *Total Daily Tokens:* \`${formatNum(actualTotal)}\`\n\n`
@@ -31,7 +34,9 @@ export const formatTokenUsageRaw = (dayData: DailyTokenData): string => {
 	if (dayData.breakdown.length > 0) {
 		for (const item of dayData.breakdown) {
 			// Kept exactly as returned by the AWS API response payload
-			message += `• \`${item.usageType}\`: *${formatNum(item.tokenCount)}*\n`
+			message += `• \`${item.usageType}\`: *${
+				formatNum(item.tokenCount)
+			}*\n`
 		}
 	} else {
 		message += `_No active usage recorded for this day._\n`
@@ -40,10 +45,12 @@ export const formatTokenUsageRaw = (dayData: DailyTokenData): string => {
 	return message
 }
 
-
 export const modelUsages = async (ctx: Context) => {
-	return ctx.reply(`Model Usages:
-	${formatTokenUsageRaw((await getTokenUsage(`1d`))[0])}`, {
-		parse_mode: 'MarkdownV2'
-	})
+	return ctx.reply(
+		`Model Usages:
+	${formatTokenUsageRaw((await getTokenUsage(`1d`))[0])}`,
+		{
+			parse_mode: 'Markdown',
+		},
+	)
 }

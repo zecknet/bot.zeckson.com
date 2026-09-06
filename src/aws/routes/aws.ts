@@ -15,7 +15,6 @@ const BEDROCK_USAGE = {
 	description: 'Get Bedrock Models usage',
 }
 
-
 aws.commands = [
 	EC2,
 	COST_BEDROCK,
