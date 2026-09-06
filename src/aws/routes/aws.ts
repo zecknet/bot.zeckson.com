@@ -1,5 +1,6 @@
 import { Composer, Context } from 'grammy'
 import { CommandComposer } from '../../util/commands.ts'
+import { bedrockHandler } from "./bedrock-handler.ts"
 import { callbackHandler, ec2Handler } from "./ec2-handler.ts"
 
 const aws = new Composer<Context>() as CommandComposer<Context>
@@ -16,9 +17,7 @@ aws.commands = [
 ]
 
 aws.command(EC2.command, ec2Handler)
-aws.command(COST.command, async (ctx: Context) => {
-	return ctx.reply(`Work in progress...`)
-})
+aws.command(COST.command, bedrockHandler)
 
 aws.callbackQuery(
 	/^aws:(start|stop):(.+)$/,
