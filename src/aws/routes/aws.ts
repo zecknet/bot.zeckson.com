@@ -1,13 +1,15 @@
 import { Instance, InstanceStateName } from '@aws-sdk/client-ec2'
 import { Composer, Context, InlineKeyboard } from 'grammy'
-import { getDailyCosts } from "../../aws/cost-explorer.ts"
-import { getInstances, startInstance, stopInstance } from '../../aws/ec2.ts'
 import { CommandComposer } from '../../util/commands.ts'
+import { getInstances, startInstance, stopInstance } from '../ec2.ts'
 
 const aws = new Composer<Context>() as CommandComposer<Context>
 
 const EC2 = { command: 'ec2', description: 'Manage AWS EC2 instances' }
-const COST = { command: 'ec2_cost', description: 'Get Current cost of AWS EC2 instances' }
+const COST = {
+	command: 'ec2_cost',
+	description: 'Get Current cost of AWS EC2 instances',
+}
 
 aws.commands = [
 	EC2,
@@ -87,7 +89,11 @@ export const callbackHandler = async (
 		let message = `Instance \`${instanceId}\` ${stateName}...`
 
 		if (instance) {
-			instance.State = { Name: action === 'start' ? InstanceStateName.pending : InstanceStateName.stopping}
+			instance.State = {
+				Name: action === 'start'
+					? InstanceStateName.pending
+					: InstanceStateName.stopping,
+			}
 			message = format(instance)
 		}
 
