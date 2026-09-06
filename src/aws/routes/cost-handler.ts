@@ -1,6 +1,6 @@
 import { ResultByTime } from '@aws-sdk/client-cost-explorer'
 import { Context } from 'grammy'
-import { DailyTokenData } from "../bedrock-usage.ts"
+import { DailyTokenData, getTokenUsage } from "../bedrock-usage.ts"
 import { costToDay, formatNum, getDailyCosts } from '../cost-explorer.ts'
 
 export const printDayCosts = (period: ResultByTime[]) =>
@@ -42,5 +42,8 @@ export const formatTokenUsageRaw = (dayData: DailyTokenData): string => {
 
 
 export const modelUsages = async (ctx: Context) => {
-
+	return ctx.reply(`Model Usages:
+	${formatTokenUsageRaw((await getTokenUsage(`1d`))[0])}`, {
+		parse_mode: 'MarkdownV2'
+	})
 }
