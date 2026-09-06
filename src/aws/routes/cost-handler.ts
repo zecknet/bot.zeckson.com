@@ -10,14 +10,12 @@ export const printDayCosts = (period: ResultByTime[]) =>
 
 export const bedrockWeeklyCosts = async (ctx: Context) => {
 	const costs = await getDailyCosts('Amazon Bedrock')
-	return ctx.reply(`Amazon Bedrock last 7 days:
-    ${printDayCosts(costs)}`)
+	return ctx.reply(`Amazon Bedrock last 7 days:\n${printDayCosts(costs)}`)
 }
 
 export const ec2WeeklyCosts = async (ctx: Context) => {
 	const costs = await getDailyCosts('EC2')
-	return ctx.reply(`EC2 last 7 days:
-    ${printDayCosts(costs)}`)
+	return ctx.reply(`EC2 last 7 days:\n${printDayCosts(costs)}`)
 }
 
 export const formatTokenUsageRaw = (dayData: DailyTokenData): string => {
