@@ -7,6 +7,14 @@ import {
 } from '@aws-sdk/client-cost-explorer'
 import { getConfig } from './aws.config.ts'
 
+export const type = {
+	'Amazon Bedrock': ['Amazon Bedrock'],
+	'EC2': [
+		'Amazon Elastic Compute Cloud - Compute', // : Tracks literal per-second server instance runtime fees
+		'EC2 - Other', // storage, ipv4, etc...
+	],
+}
+
 const client = () => new CostExplorerClient(getConfig())
 
 // helper: format date YYYY-MM-DD
@@ -24,13 +32,16 @@ export const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) =>
  * Builds a filter compound that targets a specific service while
  * explicitly filtering out any credit line items to show true gross usage.
  */
-function createGrossCostFilter(service: string): Expression {
+function createGrossCostFilter(services: string | string[]): Expression {
+	// Ensure we handle both single strings (like Bedrock) and arrays (like EC2)
+	const serviceValues = Array.isArray(services) ? services : [services]
+
 	return {
 		And: [
 			{
 				Dimensions: {
 					Key: 'SERVICE',
-					Values: [service],
+					Values: serviceValues,
 				},
 			},
 			{
@@ -44,7 +55,6 @@ function createGrossCostFilter(service: string): Expression {
 		],
 	}
 }
-
 export type DayCost = { date: string; cost: string }
 
 export const costToDay = (day: ResultByTime): DayCost => ({
@@ -58,7 +68,7 @@ export const costToDays = (
 
 // TODAY + LAST 7 DAYS COST (Excluding Credits)
 export async function getDailyCosts(
-	service = 'Amazon Bedrock',
+	services: string | string[] = 'Amazon Bedrock',
 ): Promise<ResultByTime[]> {
 	const end = new Date()
 	const start = new Date()
@@ -71,7 +81,7 @@ export async function getDailyCosts(
 		},
 		Granularity: 'DAILY',
 		Metrics: ['UnblendedCost'],
-		Filter: createGrossCostFilter(service),
+		Filter: createGrossCostFilter(services),
 	})
 
 	const explorerClient = client()
