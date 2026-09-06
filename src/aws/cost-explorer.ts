@@ -1,5 +1,5 @@
 import {
-	CostExplorerClient,
+	CostExplorerClient, Expression,
 	GetCostAndUsageCommand,
 	MetricValue,
 } from '@aws-sdk/client-cost-explorer'
@@ -15,11 +15,36 @@ function formatDate(d: Date) {
 const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) =>
 	new Intl.NumberFormat('en-US', {
 		style: 'currency',
-		currency: value.Unit,
-	}).format(Number(value.Amount))
+		currency: value.Unit ?? 'USD',
+	}).format(Number(value.Amount ?? 0))
 
-// TODAY + LAST 7 DAYS COST
-export async function getDailyCosts() {
+/**
+ * Builds a filter compound that targets a specific service while
+ * explicitly filtering out any credit line items to show true gross usage.
+ */
+function createGrossCostFilter(service: string): Expression  {
+	return {
+		And: [
+			{
+				Dimensions: {
+					Key: 'SERVICE',
+					Values: [service],
+				},
+			},
+			{
+				Not: {
+					Dimensions: {
+						Key: 'RECORD_TYPE',
+						Values: ['Credit'],
+					},
+				},
+			},
+		],
+	}
+}
+
+// TODAY + LAST 7 DAYS COST (Excluding Credits)
+export async function getDailyCosts(service = 'Amazon Bedrock') {
 	const end = new Date()
 	const start = new Date()
 	start.setDate(end.getDate() - 7)
@@ -31,6 +56,7 @@ export async function getDailyCosts() {
 		},
 		Granularity: 'DAILY',
 		Metrics: ['UnblendedCost'],
+		Filter: createGrossCostFilter(service),
 	})
 
 	const explorerClient = client()
@@ -57,7 +83,8 @@ function getMonthRange() {
 	}
 }
 
-export async function getMTDCost() {
+// MONTH TO DATE COST (Excluding Credits)
+export async function getMTDCost(service = 'Amazon Bedrock') {
 	const command = new GetCostAndUsageCommand({
 		TimePeriod: getMonthRange(),
 		Granularity: 'MONTHLY',
@@ -69,10 +96,15 @@ export async function getMTDCost() {
 			'NetAmortizedCost',
 			'UsageQuantity',
 		],
+		Filter: createGrossCostFilter(service),
 	})
 
-	const res = await client().send(command)
-
-	const resultsByTime = res.ResultsByTime ?? []
-	return resultsByTime[0]?.Total
+	const explorerClient = client()
+	try {
+		const res = await explorerClient.send(command)
+		const resultsByTime = res.ResultsByTime ?? []
+		return resultsByTime[0]?.Total
+	} finally {
+		explorerClient.destroy()
+	}
 }

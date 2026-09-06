@@ -1,14 +1,17 @@
 import { Instance, InstanceStateName } from '@aws-sdk/client-ec2'
 import { Composer, Context, InlineKeyboard } from 'grammy'
+import { getDailyCosts } from "../../aws/cost-explorer.ts"
 import { getInstances, startInstance, stopInstance } from '../../aws/ec2.ts'
 import { CommandComposer } from '../../util/commands.ts'
 
 const aws = new Composer<Context>() as CommandComposer<Context>
 
 const EC2 = { command: 'ec2', description: 'Manage AWS EC2 instances' }
+const COST = { command: 'ec2_cost', description: 'Get Current cost of AWS EC2 instances' }
 
 aws.commands = [
 	EC2,
+	COST,
 ]
 
 const format = (ins: Instance): string => {
@@ -60,6 +63,9 @@ export const ec2Handler = async (ctx: Context) => {
 }
 
 aws.command(EC2.command, ec2Handler)
+aws.command(COST.command, async (ctx: Context) => {
+	return ctx.reply(`Work in progress...`)
+})
 
 export const callbackHandler = async (
 	ctx: Context & { match: RegExpExecArray },
