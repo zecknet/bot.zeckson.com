@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno run --allow-read --allow-net --allow-env --watch --unstable-kv main.ts",
+    "dev": "deno run --allow-read --allow-net --allow-env --allow-sys --watch --unstable-kv main.ts",
     "start": "deno run --allow-read --allow-net --allow-env server.ts",
     "predeploy": "deno run --allow-all --unstable-kv webhook.prod.ts",
     "predeploy:local": "deno run --allow-all --unstable-kv webhook.local.ts",
