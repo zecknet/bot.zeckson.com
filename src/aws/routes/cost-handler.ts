@@ -47,8 +47,7 @@ export const formatTokenUsageRaw = (dayData: DailyTokenData): string => {
 
 export const modelUsages = async (ctx: Context) => {
 	return ctx.reply(
-		`Model Usages:
-	${formatTokenUsageRaw((await getTokenUsage(`1d`))[0])}`,
+		`Model Usages:\n${formatTokenUsageRaw((await getTokenUsage(`1d`))[0])}`,
 		{
 			parse_mode: 'Markdown',
 		},
