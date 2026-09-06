@@ -1,3 +1,4 @@
+import { getTokenUsage } from "./bedrock-usage.ts"
 import { getDailyCosts, getMTDCost, toUSD } from './cost-explorer.ts'
 import { printDayCosts } from './routes/cost-handler.ts'
 
@@ -22,5 +23,7 @@ Deno.test({
 				Number(mtdCosts?.Total?.UsageQuantity.Amount ?? 0) / 1000
 			} mln tokens used `
 		console.log('MTD cost:', message)
+
+		console.log(await getTokenUsage('1d'))
 	},
 })

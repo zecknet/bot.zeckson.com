@@ -18,10 +18,10 @@ export const COST_SERVICE_MAPPING = {
 // Optional: Create a type out of your map keys ('Amazon Bedrock' | 'EC2')
 export type TrackedService = keyof typeof COST_SERVICE_MAPPING
 
-const client = () => new CostExplorerClient(getConfig())
+export const costExplorer = () => new CostExplorerClient(getConfig())
 
 // helper: format date YYYY-MM-DD
-function formatDate(d: Date) {
+export const formatDate = (d: Date) => {
 	return d.toISOString().split('T')[0]
 }
 
@@ -89,7 +89,7 @@ export async function getDailyCosts(
 		),
 	})
 
-	const explorerClient = client()
+	const explorerClient = costExplorer()
 	try {
 		const res = await explorerClient.send(command)
 		return res.ResultsByTime ?? []
@@ -128,7 +128,7 @@ export async function getMTDCost(
 		Filter: createGrossCostFilter(service),
 	})
 
-	const explorerClient = client()
+	const explorerClient = costExplorer()
 	try {
 		const res = await explorerClient.send(command)
 		const resultsByTime = res.ResultsByTime ?? []
