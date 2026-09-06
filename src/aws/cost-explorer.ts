@@ -111,8 +111,8 @@ function getMonthRange() {
 }
 
 // MONTH TO DATE COST (Excluding Credits)
-export async function getMTDCost(
-	service = 'Amazon Bedrock',
+export async function getMonthlyCosts(
+	...services: TrackedService[]
 ): Promise<ResultByTime | undefined> {
 	const command = new GetCostAndUsageCommand({
 		TimePeriod: getMonthRange(),
@@ -125,7 +125,9 @@ export async function getMTDCost(
 			'NetAmortizedCost',
 			'UsageQuantity',
 		],
-		Filter: createGrossCostFilter(service),
+		Filter: createGrossCostFilter(
+			services.flatMap((service) => COST_SERVICE_MAPPING[service]),
+		),
 	})
 
 	const explorerClient = costExplorer()

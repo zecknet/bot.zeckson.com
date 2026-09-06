@@ -1,5 +1,5 @@
 import { getTokenUsage } from './bedrock-usage.ts'
-import { getDailyCosts, getMTDCost, toUSD } from './cost-explorer.ts'
+import { getDailyCosts, getMonthlyCosts, toUSD } from './cost-explorer.ts'
 import { formatTokenUsageRaw, printDayCosts } from './routes/cost-handler.ts'
 
 Deno.test({
@@ -13,9 +13,9 @@ Deno.test({
 	},
 	async fn() {
 		await import('../config.local.ts')
-		const costs = await getDailyCosts('EC2')
+		const costs = await getDailyCosts('EC2', 'Amazon Bedrock')
 		console.log(printDayCosts(costs))
-		const mtdCosts = await getMTDCost()
+		const mtdCosts = await getMonthlyCosts('EC2', 'Amazon Bedrock')
 		const message =
 			`From: ${mtdCosts?.TimePeriod?.Start} To: ${mtdCosts?.TimePeriod?.End}
 		Total service used: ${toUSD(mtdCosts?.Total?.UnblendedCost)}

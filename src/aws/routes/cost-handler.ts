@@ -16,7 +16,7 @@ export const bedrockWeeklyCosts = async (ctx: Context) => {
 
 export const ec2WeeklyCosts = async (ctx: Context) => {
 	const costs = await getDailyCosts('EC2')
-	return ctx.reply(`Amazon Bedrock last 7 days:
+	return ctx.reply(`EC2 last 7 days:
     ${printDayCosts(costs)}`)
 }
 
