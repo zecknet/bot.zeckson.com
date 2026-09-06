@@ -1,3 +1,4 @@
+import '../config.local.ts'
 import { getDailyCosts, getMTDCost } from './cost-explorer.ts'
 
 Deno.test({
@@ -7,10 +8,12 @@ Deno.test({
 		read: true,
 		env: true,
 		sys: true,
+		net: true,
 	},
 	async fn() {
-		await import('../config.local.ts')
-		console.log('Daily costs:', await getDailyCosts())
-		console.log('MTD cost:', await getMTDCost())
+		const costs = await getDailyCosts()
+		console.log('Daily costs:', costs?.map(it => `${it.date}: ${it.cost}`).join('\n'))
+		const mtdCosts = await getMTDCost()
+		console.log('MTD cost:', mtdCosts)
 	},
 })
