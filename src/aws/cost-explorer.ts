@@ -1,7 +1,9 @@
 import {
-	CostExplorerClient, Expression,
+	CostExplorerClient,
+	Expression,
 	GetCostAndUsageCommand,
 	MetricValue,
+	ResultByTime,
 } from '@aws-sdk/client-cost-explorer'
 import { getConfig } from './aws.config.ts'
 
@@ -12,7 +14,7 @@ function formatDate(d: Date) {
 	return d.toISOString().split('T')[0]
 }
 
-const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) =>
+export const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) =>
 	new Intl.NumberFormat('en-US', {
 		style: 'currency',
 		currency: value.Unit ?? 'USD',
@@ -22,7 +24,7 @@ const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) =>
  * Builds a filter compound that targets a specific service while
  * explicitly filtering out any credit line items to show true gross usage.
  */
-function createGrossCostFilter(service: string): Expression  {
+function createGrossCostFilter(service: string): Expression {
 	return {
 		And: [
 			{
@@ -43,8 +45,21 @@ function createGrossCostFilter(service: string): Expression  {
 	}
 }
 
+export type DayCost = { date: string; cost: string }
+
+export const costToDay = (day: ResultByTime): DayCost => ({
+	date: day.TimePeriod?.Start ?? `unknown`,
+	cost: toUSD(day.Total?.UnblendedCost),
+})
+
+export const costToDays = (
+	days: ResultByTime[],
+): DayCost[] => days.map(costToDay)
+
 // TODAY + LAST 7 DAYS COST (Excluding Credits)
-export async function getDailyCosts(service = 'Amazon Bedrock') {
+export async function getDailyCosts(
+	service = 'Amazon Bedrock',
+): Promise<ResultByTime[]> {
 	const end = new Date()
 	const start = new Date()
 	start.setDate(end.getDate() - 7)
@@ -62,10 +77,7 @@ export async function getDailyCosts(service = 'Amazon Bedrock') {
 	const explorerClient = client()
 	try {
 		const res = await explorerClient.send(command)
-		return res.ResultsByTime?.map((day) => ({
-			date: day.TimePeriod?.Start,
-			cost: toUSD(day.Total?.UnblendedCost),
-		}))
+		return res.ResultsByTime ?? []
 	} finally {
 		explorerClient.destroy()
 	}
@@ -84,7 +96,9 @@ function getMonthRange() {
 }
 
 // MONTH TO DATE COST (Excluding Credits)
-export async function getMTDCost(service = 'Amazon Bedrock') {
+export async function getMTDCost(
+	service = 'Amazon Bedrock',
+): Promise<ResultByTime | undefined> {
 	const command = new GetCostAndUsageCommand({
 		TimePeriod: getMonthRange(),
 		Granularity: 'MONTHLY',
@@ -103,7 +117,9 @@ export async function getMTDCost(service = 'Amazon Bedrock') {
 	try {
 		const res = await explorerClient.send(command)
 		const resultsByTime = res.ResultsByTime ?? []
-		return resultsByTime[0]?.Total
+
+		// FIX: Always pick the last item in the array to get the active month
+		return resultsByTime[resultsByTime.length - 1]
 	} finally {
 		explorerClient.destroy()
 	}

@@ -1,5 +1,6 @@
 import '../config.local.ts'
-import { getDailyCosts, getMTDCost } from './cost-explorer.ts'
+import { getDailyCosts, getMTDCost, toUSD } from './cost-explorer.ts'
+import { printDayCosts } from './routes/bedrock-handler.ts'
 
 Deno.test({
 	name: 'CostExplorer',
@@ -12,8 +13,14 @@ Deno.test({
 	},
 	async fn() {
 		const costs = await getDailyCosts()
-		console.log('Daily costs:', costs?.map(it => `${it.date}: ${it.cost}`).join('\n'))
+		console.log(printDayCosts(costs))
 		const mtdCosts = await getMTDCost()
-		console.log('MTD cost:', mtdCosts)
+		const message =
+			`From: ${mtdCosts?.TimePeriod?.Start} To: ${mtdCosts?.TimePeriod?.End}
+		Total service used: ${toUSD(mtdCosts?.Total?.UnblendedCost)}
+		Total tokens used: ${
+				Number(mtdCosts?.Total?.UsageQuantity.Amount ?? 0) / 1000
+			} mln tokens used `
+		console.log('MTD cost:', message)
 	},
 })
