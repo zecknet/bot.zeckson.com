@@ -7,7 +7,7 @@ import {
 } from '@aws-sdk/client-cost-explorer'
 import { getConfig } from './aws.config.ts'
 
-export const type = {
+export const SERVICE_TYPE: Record<string, string[]> = {
 	'Amazon Bedrock': ['Amazon Bedrock'],
 	'EC2': [
 		'Amazon Elastic Compute Cloud - Compute', // : Tracks literal per-second server instance runtime fees
@@ -68,7 +68,7 @@ export const costToDays = (
 
 // TODAY + LAST 7 DAYS COST (Excluding Credits)
 export async function getDailyCosts(
-	services: string | string[] = 'Amazon Bedrock',
+	services: string | string[] = SERVICE_TYPE["Amazon Bedrock"],
 ): Promise<ResultByTime[]> {
 	const end = new Date()
 	const start = new Date()
