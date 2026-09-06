@@ -139,3 +139,6 @@ export async function getMTDCost(
 		explorerClient.destroy()
 	}
 }
+
+export const formatNum = (num: number) =>
+	new Intl.NumberFormat('en-US', { maximumFractionDigits: 3 }).format(num)

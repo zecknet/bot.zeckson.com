@@ -1,10 +1,10 @@
 import { getTokenUsage } from "./bedrock-usage.ts"
 import { getDailyCosts, getMTDCost, toUSD } from './cost-explorer.ts'
-import { printDayCosts } from './routes/cost-handler.ts'
+import { formatTokenUsageRaw, printDayCosts } from './routes/cost-handler.ts'
 
 Deno.test({
 	name: 'CostExplorer',
-	ignore: true,
+	ignore: false,
 	permissions: {
 		read: true,
 		env: true,
@@ -24,6 +24,7 @@ Deno.test({
 			} mln tokens used `
 		console.log('MTD cost:', message)
 
-		console.log(await getTokenUsage('1d'))
+		const usage1d = await getTokenUsage('1d')
+		console.log(formatTokenUsageRaw(usage1d[0]))
 	},
 })
