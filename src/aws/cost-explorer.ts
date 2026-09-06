@@ -13,10 +13,10 @@ export const COST_SERVICE_MAPPING = {
 		'Amazon Elastic Compute Cloud - Compute', // Tracks literal per-second server instance runtime fees
 		'EC2 - Other', // storage, ipv4, etc...
 	],
-} as const;
+} as const
 
 // Optional: Create a type out of your map keys ('Amazon Bedrock' | 'EC2')
-export type TrackedService = keyof typeof COST_SERVICE_MAPPING;
+export type TrackedService = keyof typeof COST_SERVICE_MAPPING
 
 const client = () => new CostExplorerClient(getConfig())
 
@@ -84,7 +84,9 @@ export async function getDailyCosts(
 		},
 		Granularity: 'DAILY',
 		Metrics: ['UnblendedCost'],
-		Filter: createGrossCostFilter(services.flatMap((service) => COST_SERVICE_MAPPING[service])),
+		Filter: createGrossCostFilter(
+			services.flatMap((service) => COST_SERVICE_MAPPING[service]),
+		),
 	})
 
 	const explorerClient = client()
