@@ -1,4 +1,3 @@
-import '../config.local.ts'
 import { getDailyCosts, getMTDCost, toUSD } from './cost-explorer.ts'
 import { printDayCosts } from './routes/cost-handler.ts'
 
@@ -12,6 +11,7 @@ Deno.test({
 		net: true,
 	},
 	async fn() {
+		await import('../config.local.ts')
 		const costs = await getDailyCosts('EC2')
 		console.log(printDayCosts(costs))
 		const mtdCosts = await getMTDCost()
