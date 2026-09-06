@@ -3,7 +3,7 @@ import { config } from '../config.ts'
 
 export const getConfig = (extra: object = {}): EC2ClientConfig => {
 	const result = {
-		region: config.AWS_REGION!,
+		region: config.AWS_REGION,
 		credentials: {
 			accessKeyId: config.AWS_ACCESS_KEY_ID!,
 			secretAccessKey: config.AWS_SECRET_ACCESS_KEY!,
