@@ -1,6 +1,10 @@
 import { Composer, Context } from 'grammy'
 import { CommandComposer } from '../../util/commands.ts'
-import { bedrockWeeklyCosts, ec2WeeklyCosts, modelUsages } from './cost-handler.ts'
+import {
+	bedrockWeeklyCosts,
+	ec2WeeklyCosts,
+	modelUsages,
+} from './cost-handler.ts'
 import { callbackHandler, ec2Handler } from './ec2-handler.ts'
 
 const aws = new Composer<Context>() as CommandComposer<Context>
@@ -23,7 +27,7 @@ aws.commands = [
 	EC2,
 	COST_BEDROCK,
 	BEDROCK_USAGE,
-	EC2_COST
+	EC2_COST,
 ]
 
 aws.command(EC2.command, ec2Handler)
