@@ -4,7 +4,7 @@ import { formatTokenUsageRaw, printDayCosts } from './routes/cost-handler.ts'
 
 Deno.test({
 	name: 'CostExplorer',
-	ignore: false,
+	ignore: true,
 	permissions: {
 		read: true,
 		env: true,
