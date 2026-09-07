@@ -5,6 +5,9 @@ import {
 	MetricValue,
 	ResultByTime,
 } from '@aws-sdk/client-cost-explorer'
+import { toCurrency } from "../formatters/currency.ts"
+import { day } from "../formatters/date.ts"
+import { usd } from "../formatters/usd.ts"
 import { getConfig } from './aws.config.ts'
 
 export const COST_SERVICE_MAPPING = {
@@ -22,20 +25,16 @@ export const costExplorer = () => new CostExplorerClient(getConfig())
 
 // helper: format date YYYY-MM-DD
 export const formatDate = (d: Date) => {
-	return d.toISOString().split('T')[0]
+	return day(d)
 }
 
-export const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) =>
-	new Intl.NumberFormat('en-US', {
-		style: 'currency',
-		currency: value.Unit ?? 'USD',
-	}).format(Number(value.Amount ?? 0))
-
+export const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) => toCurrency(value)
+export const formatUSD = (num: number) => usd(num)
 /**
  * Builds a filter compound that targets a specific service while
  * explicitly filtering out any credit line items to show true gross usage.
  */
-function createGrossCostFilter(services: string | string[]): Expression {
+export function createGrossCostFilter(services: string | string[]): Expression {
 	// Ensure we handle both single strings (like Bedrock) and arrays (like EC2)
 	const serviceValues = Array.isArray(services) ? services : [services]
 

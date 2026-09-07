@@ -1,16 +1,22 @@
 import { GetCostAndUsageCommand } from '@aws-sdk/client-cost-explorer'
-import { costExplorer, formatDate } from './cost-explorer.ts'
+import {
+	costExplorer,
+	createGrossCostFilter,
+	formatDate,
+} from './cost-explorer.ts'
 
 const client = costExplorer
 
 export interface TokenBreakdown {
 	usageType: string
 	tokenCount: number
+	cost: number
 }
 
 export interface DailyTokenData {
 	date: string
 	totalTokens: number
+	totalCost: number
 	breakdown: TokenBreakdown[]
 }
 
@@ -32,14 +38,9 @@ export async function getTokenUsage(
 			End: formatDate(end),
 		},
 		Granularity: 'DAILY',
-		// SWITCH: Requesting raw structural volume instead of financial numbers
-		Metrics: ['UsageQuantity'],
-		Filter: {
-			Dimensions: {
-				Key: 'SERVICE',
-				Values: [service],
-			},
-		},
+		// Requesting both raw structural volume and financial numbers
+		Metrics: ['UsageQuantity', 'UnblendedCost'],
+		Filter: createGrossCostFilter(service),
 		// Groups token counts by specific Input vs Output model lines
 		GroupBy: [
 			{
@@ -54,23 +55,31 @@ export async function getTokenUsage(
 		const res = await explorerClient.send(command)
 
 		return res.ResultsByTime?.map((day) => {
-			const breakdowns = day.Groups?.map((group) => {
+			const breakdowns = (day.Groups?.map((group) => {
 				const usageType = group.Keys?.[0] ?? 'Unknown'
 				const tokenCount = Number(
 					group.Metrics?.UsageQuantity?.Amount ?? 0,
 				)
+				const cost = Number(
+					group.Metrics?.UnblendedCost?.Amount ?? 0,
+				)
 
-				return { usageType, tokenCount }
-			}).filter((b) => b.tokenCount > 0) // Filter out inactive types
+				return { usageType, tokenCount, cost }
+			}) ?? []).filter((b) => b.tokenCount > 0 || b.cost > 0) // Filter out inactive types
 
-			const totalForDay = Number(day.Total?.UsageQuantity?.Amount ?? 0)
+			const totalTokens = Number(day.Total?.UsageQuantity?.Amount ?? 0)
+			const totalCost = Number(day.Total?.UnblendedCost?.Amount ?? 0)
 
 			return {
-				date: day.TimePeriod?.Start,
-				totalTokens: totalForDay,
+				date: day.TimePeriod?.Start ?? 'Unknown',
+				totalTokens,
+				totalCost,
 				breakdown: breakdowns,
-			} as DailyTokenData
-		}) as DailyTokenData[]
+			}
+		}) ?? []
+	} catch (error) {
+		console.error('Error fetching Bedrock usage:', error)
+		return []
 	} finally {
 		explorerClient.destroy()
 	}
