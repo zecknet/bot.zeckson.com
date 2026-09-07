@@ -172,6 +172,21 @@ ${FormattedString.b('Token:')} ${FormattedString.code(token)}`
 	}
 })
 
+export const formatBotList = (managedBots: ManagedBot[]) => {
+	if (managedBots.length === 0) {
+		return fmt`No managed bots found.`
+	}
+
+	const botList = managedBots.map((bot) => {
+		const botName = bot.name ? fmt` - ${bot.name}` : ''
+		return fmt`- ${
+			FormattedString.code(bot.token)
+		} (added by ${bot.addedBy})${botName}`
+	})
+
+	return fmt`${FormattedString.bold('Managed bots:')}\n${FormattedString.join(botList, '\n')}`
+}
+
 bots.command(LIST_BOTS.command, async (ctx) => {
 	const userId = ctx.from?.id
 	if (!userId || !config.ADMIN_USER_IDS.includes(userId.toString())) {
@@ -182,21 +197,7 @@ bots.command(LIST_BOTS.command, async (ctx) => {
 		const repo = await getRepo()
 		const managedBots = await repo.listBots()
 
-		if (managedBots.length === 0) {
-			return ctx.reply('No managed bots found.')
-		}
-
-		const botList = managedBots.map((bot) => {
-			const botName = bot.name ? fmt` - ${bot.name}` : ''
-			return fmt`- ${
-				FormattedString.code(bot.token)
-			} (added by ${bot.addedBy})${botName}`
-		})
-
-		console.log(botList)
-
-		const message = fmt`${FormattedString.b(`Managed bots:`)} 
-        ${botList.join('\n')}`
+		const message = formatBotList(managedBots)
 
 		await ctx.reply(message.text, {
 			entities: message.entities,

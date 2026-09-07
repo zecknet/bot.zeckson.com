@@ -1,7 +1,33 @@
 import { assertEquals, assertRejects } from '@std/assert'
-import { addBot } from './bots.ts'
+import { addBot, formatBotList } from './bots.ts'
 import { BotRepository } from '../../repository/bot.repository.ts'
 import { DenoStore } from '../../store/denostore.ts'
+
+Deno.test('formatBotList', () => {
+	const bots = [
+		{
+			token: 'token1',
+			addedBy: 123,
+			addedAt: Date.now(),
+			name: 'Bot 1',
+		},
+		{
+			token: 'token2',
+			addedBy: 456,
+			addedAt: Date.now(),
+		},
+	]
+
+	const result = formatBotList(bots)
+	assertEquals(result.text.includes('Managed bots:'), true)
+	assertEquals(result.text.includes('token1 (added by 123) - Bot 1'), true)
+	assertEquals(result.text.includes('token2 (added by 456)'), true)
+	// Bold header + 2 code tokens
+	assertEquals(result.entities.length, 3)
+	assertEquals(result.entities[0].type, 'bold')
+	assertEquals(result.entities[1].type, 'code')
+	assertEquals(result.entities[2].type, 'code')
+})
 
 Deno.test('addBot - business logic', async () => {
 	const kv = await Deno.openKv(':memory:')

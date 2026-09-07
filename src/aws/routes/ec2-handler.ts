@@ -1,17 +1,23 @@
 import { Instance } from '@aws-sdk/client-ec2'
 import { Context, InlineKeyboard } from 'grammy'
+import { fmt, FormattedString } from '@grammyjs/parse-mode'
 import { getInstances, startInstance, stopInstance } from '../ec2.ts'
 
-const format = (ins: Instance): string => {
+export const format = (ins: Instance) => {
 	const nameTag = ins.Tags?.find((t) => t.Key === 'Name')?.Value
-	const name = nameTag ? `*${nameTag}*` : '`unnamed`'
-	const id = `\`${ins.InstanceId}\``
+	const name = nameTag ? FormattedString.bold(nameTag) : FormattedString.italic('unnamed')
+	const id = FormattedString.code(ins.InstanceId || 'unknown')
 	const state = ins.State?.Name || 'unknown'
 	const type = ins.InstanceType || 'unknown'
-	return `${name} (${id})
-	Type: ${type}
-	State: ${state}
-	Public IP: \`${ins.PublicIpAddress}\``
+
+	let stateEmoji = '🟡'
+	if (state === 'running') stateEmoji = '🟢'
+	else if (state === 'stopped') stateEmoji = '🔴'
+
+	return fmt`${name} (${id})
+Type: ${type}
+State: ${stateEmoji} ${state}
+Public IP: ${FormattedString.code(ins.PublicIpAddress || 'none')}`
 }
 export const ec2Handler = async (ctx: Context) => {
 	try {
@@ -34,8 +40,8 @@ export const ec2Handler = async (ctx: Context) => {
 				keyboard.text('⏹️ Stop', `aws:stop:${id}`)
 			}
 
-			await ctx.reply(text, {
-				parse_mode: 'Markdown',
+			await ctx.reply(text.text, {
+				entities: text.entities,
 				reply_markup: keyboard,
 			})
 		}
@@ -65,7 +71,7 @@ export const callbackHandler = async (
 		}
 
 		const stateName = action === 'start' ? 'starting' : 'stopping'
-		let message = `Instance \`${instanceId}\` ${stateName}...`
+		let message = fmt`Instance ${FormattedString.code(instanceId)} ${stateName}...`
 
 		if (instance) {
 			instance.State = {
@@ -75,8 +81,11 @@ export const callbackHandler = async (
 		}
 
 		await ctx.editMessageText(
-			message,
-			{ parse_mode: 'Markdown', reply_markup: undefined },
+			message.text,
+			{
+				entities: message.entities,
+				reply_markup: undefined,
+			},
 		)
 	} catch (error) {
 		console.error(`EC2 ${action} Error:`, error)
