@@ -59,10 +59,6 @@ export const formatTokenUsageRaw = (dayData: DailyTokenData) => {
 		'Model'.length,
 	)
 
-	const tbl = `| Header 1 | Header 2 |
-|:---------|:--------:|
-| left     | center   |`
-
 	const tableHeader = `| Model | Tokens | Cost |`
 	const separator = `|:${'-'.repeat(maxUsageTypeLen)}|:${'-'.repeat(10)}:|:${
 		'-'.repeat(10)
