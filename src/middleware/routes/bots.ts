@@ -184,7 +184,9 @@ export const formatBotList = (managedBots: ManagedBot[]) => {
 		} (added by ${bot.addedBy})${botName}`
 	})
 
-	return fmt`${FormattedString.bold('Managed bots:')}\n${FormattedString.join(botList, '\n')}`
+	return fmt`${FormattedString.bold('Managed bots:')}\n${
+		FormattedString.join(botList, '\n')
+	}`
 }
 
 bots.command(LIST_BOTS.command, async (ctx) => {

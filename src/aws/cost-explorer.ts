@@ -5,9 +5,9 @@ import {
 	MetricValue,
 	ResultByTime,
 } from '@aws-sdk/client-cost-explorer'
-import { toCurrency } from "../formatters/currency.ts"
-import { day } from "../formatters/date.ts"
-import { usd } from "../formatters/usd.ts"
+import { toCurrency } from '../formatters/currency.ts'
+import { day } from '../formatters/date.ts'
+import { usd } from '../formatters/usd.ts'
 import { getConfig } from './aws.config.ts'
 
 export const COST_SERVICE_MAPPING = {
@@ -28,7 +28,8 @@ export const formatDate = (d: Date) => {
 	return day(d)
 }
 
-export const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) => toCurrency(value)
+export const toUSD = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) =>
+	toCurrency(value)
 export const formatUSD = (num: number) => usd(num)
 /**
  * Builds a filter compound that targets a specific service while

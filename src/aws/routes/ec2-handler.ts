@@ -5,7 +5,9 @@ import { getInstances, startInstance, stopInstance } from '../ec2.ts'
 
 export const format = (ins: Instance) => {
 	const nameTag = ins.Tags?.find((t) => t.Key === 'Name')?.Value
-	const name = nameTag ? FormattedString.bold(nameTag) : FormattedString.italic('unnamed')
+	const name = nameTag
+		? FormattedString.bold(nameTag)
+		: FormattedString.italic('unnamed')
 	const id = FormattedString.code(ins.InstanceId || 'unknown')
 	const state = ins.State?.Name || 'unknown'
 	const type = ins.InstanceType || 'unknown'
@@ -71,7 +73,9 @@ export const callbackHandler = async (
 		}
 
 		const stateName = action === 'start' ? 'starting' : 'stopping'
-		let message = fmt`Instance ${FormattedString.code(instanceId)} ${stateName}...`
+		let message = fmt`Instance ${
+			FormattedString.code(instanceId)
+		} ${stateName}...`
 
 		if (instance) {
 			instance.State = {

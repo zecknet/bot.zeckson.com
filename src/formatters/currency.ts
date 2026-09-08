@@ -8,4 +8,3 @@ export const toCurrency = (value: MetricValue = { Amount: `0`, Unit: 'USD' }) =>
 		style: 'currency',
 		currency: value.Unit ?? 'USD',
 	}).format(Number(value.Amount ?? 0))
-

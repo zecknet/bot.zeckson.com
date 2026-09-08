@@ -12,7 +12,10 @@ Deno.test('ec2-handler format: running instance', () => {
 	}
 
 	const result = format(mockInstance)
-	assertEquals(result.text, 'test-instance (i-1234567890abcdef0)\nType: t2.micro\nState: 🟢 running\nPublic IP: 1.2.3.4')
+	assertEquals(
+		result.text,
+		'test-instance (i-1234567890abcdef0)\nType: t2.micro\nState: 🟢 running\nPublic IP: 1.2.3.4',
+	)
 	// Bold name, code ID, code IP
 	assertEquals(result.entities.length, 3)
 	assertEquals(result.entities[0].type, 'bold')
@@ -30,7 +33,10 @@ Deno.test('ec2-handler format: stopped instance without name', () => {
 	}
 
 	const result = format(mockInstance)
-	assertEquals(result.text, 'unnamed (i-0987654321fedcba0)\nType: t3.medium\nState: 🔴 stopped\nPublic IP: none')
+	assertEquals(
+		result.text,
+		'unnamed (i-0987654321fedcba0)\nType: t3.medium\nState: 🔴 stopped\nPublic IP: none',
+	)
 	// Italic "unnamed", code ID, code "none"
 	assertEquals(result.entities.length, 3)
 	assertEquals(result.entities[0].type, 'italic')
@@ -47,5 +53,8 @@ Deno.test('ec2-handler format: pending instance', () => {
 	}
 
 	const result = format(mockInstance)
-	assertEquals(result.text, 'unnamed (i-pending)\nType: t2.small\nState: 🟡 pending\nPublic IP: none')
+	assertEquals(
+		result.text,
+		'unnamed (i-pending)\nType: t2.small\nState: 🟡 pending\nPublic IP: none',
+	)
 })

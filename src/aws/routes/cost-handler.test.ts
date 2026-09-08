@@ -1,8 +1,7 @@
-import { assertEquals } from '@std/assert'
-import { render } from "@deno/gfm"
-import { formatTokenUsageRaw, printDayCosts } from './cost-handler.ts'
 import { ResultByTime } from '@aws-sdk/client-cost-explorer'
+import { assertEquals } from '@std/assert'
 import { DailyTokenData } from '../bedrock-usage.ts'
+import { formatTokenUsageRaw, printDayCosts } from './cost-handler.ts'
 
 Deno.test('cost-handler printDayCosts: multiple days', () => {
 	const mockPeriod: ResultByTime[] = [
@@ -37,7 +36,9 @@ Deno.test('cost-handler formatTokenUsageRaw: with data', () => {
 	}
 
 	const result = formatTokenUsageRaw(mockData)
-	assertEquals(result, `📅 **Date:** \`2023-01-01\`
+	assertEquals(
+		result,
+		`📅 **Date:** \`2023-01-01\`
 
 📊 **Total Daily Tokens:** \`3,500\`
 
@@ -49,7 +50,8 @@ Deno.test('cost-handler formatTokenUsageRaw: with data', () => {
 | Model | Tokens | Cost |
 |:------|:----------:|:----------:|
 | ModelA | 1,000 | $0.05 |
-| ModelB | 2,500 | $0.07 |`)
+| ModelB | 2,500 | $0.07 |`,
+	)
 
 	console.log(result)
 })
@@ -64,7 +66,9 @@ Deno.test('cost-handler formatTokenUsageRaw: empty data', () => {
 
 	const result = formatTokenUsageRaw(mockData)
 	console.log(result)
-	assertEquals(result, `📅 **Date:** \`2023-01-01\`
+	assertEquals(
+		result,
+		`📅 **Date:** \`2023-01-01\`
 
 📊 **Total Daily Tokens:** \`0\`
 
@@ -73,5 +77,6 @@ Deno.test('cost-handler formatTokenUsageRaw: empty data', () => {
 
 **Breakdown by Model:**
 
-_No active usage recorded for this day._`)
+_No active usage recorded for this day._`,
+	)
 })

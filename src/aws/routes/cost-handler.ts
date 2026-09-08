@@ -64,7 +64,9 @@ export const formatTokenUsageRaw = (dayData: DailyTokenData) => {
 | left     | center   |`
 
 	const tableHeader = `| Model | Tokens | Cost |`
-	const separator = `|:${'-'.repeat(maxUsageTypeLen)}|:${'-'.repeat(10)}:|:${'-'.repeat(10)}:|`
+	const separator = `|:${'-'.repeat(maxUsageTypeLen)}|:${'-'.repeat(10)}:|:${
+		'-'.repeat(10)
+	}:|`
 
 	const rows = dayData.breakdown.map((item) => {
 		const tokens = formatNum(item.tokenCount)
