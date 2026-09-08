@@ -1,4 +1,5 @@
 import { assertEquals } from '@std/assert'
+import { render } from "@deno/gfm"
 import { formatTokenUsageRaw, printDayCosts } from './cost-handler.ts'
 import { ResultByTime } from '@aws-sdk/client-cost-explorer'
 import { DailyTokenData } from '../bedrock-usage.ts'
@@ -36,14 +37,21 @@ Deno.test('cost-handler formatTokenUsageRaw: with data', () => {
 	}
 
 	const result = formatTokenUsageRaw(mockData)
-	assertEquals(result.text.includes('Date: 2023-01-01'), true)
-	assertEquals(result.text.includes('Total Daily Tokens: 3,500'), true)
-	assertEquals(result.text.includes('Total Daily Cost: $0.12'), true)
-	assertEquals(result.text.includes('| ModelA |      1,000 |      $0.05 |'), true)
-	assertEquals(result.text.includes('| ModelB |      2,500 |      $0.07 |'), true)
-	
-	// bold, code, bold, code, bold, pre
-	assertEquals(result.entities.some(e => e.type === 'pre'), true)
+	assertEquals(result, `📅 **Date:** \`2023-01-01\`
+
+📊 **Total Daily Tokens:** \`3,500\`
+
+💰 **Total Daily Cost:** \`$0.12\`
+
+
+**Breakdown by Model:**
+
+| Model | Tokens | Cost |
+|:------|:----------:|:----------:|
+| ModelA | 1,000 | $0.05 |
+| ModelB | 2,500 | $0.07 |`)
+
+	console.log(result)
 })
 
 Deno.test('cost-handler formatTokenUsageRaw: empty data', () => {
@@ -55,6 +63,15 @@ Deno.test('cost-handler formatTokenUsageRaw: empty data', () => {
 	}
 
 	const result = formatTokenUsageRaw(mockData)
-	assertEquals(result.text.includes('No active usage recorded for this day.'), true)
-	assertEquals(result.entities.some(e => e.type === 'italic'), true)
+	console.log(result)
+	assertEquals(result, `📅 **Date:** \`2023-01-01\`
+
+📊 **Total Daily Tokens:** \`0\`
+
+💰 **Total Daily Cost:** \`$0.00\`
+
+
+**Breakdown by Model:**
+
+_No active usage recorded for this day._`)
 })

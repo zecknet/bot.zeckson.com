@@ -1,6 +1,6 @@
 import { ResultByTime } from '@aws-sdk/client-cost-explorer'
-import { Context } from 'grammy'
 import { fmt, FormattedString } from '@grammyjs/parse-mode'
+import { Context } from 'grammy'
 import { DailyTokenData, getTokenUsage } from '../bedrock-usage.ts'
 import {
 	costToDay,
@@ -15,7 +15,9 @@ export const printDayCosts = (period: ResultByTime[]) => {
 
 	const tableHeader = `| ${'Date'.padEnd(10)} | ${'Cost'.padStart(9)} |`
 	const separator = `| ${'-'.repeat(10)} | ${'-'.repeat(9)} |`
-	const rows = data.map((it) => `| ${it.date.padEnd(10)} | ${it.cost.padStart(9)} |`)
+	const rows = data.map((it) =>
+		`| ${it.date.padEnd(10)} | ${it.cost.padStart(9)} |`
+	)
 	const table = [tableHeader, separator, ...rows].join('\n')
 
 	return fmt`Daily costs:
@@ -37,15 +39,18 @@ ${printDayCosts(costs)}`
 }
 
 export const formatTokenUsageRaw = (dayData: DailyTokenData) => {
-	const header = fmt`📅 ${FormattedString.bold('Date:')} ${FormattedString.code(dayData.date)}
-📊 ${FormattedString.bold('Total Daily Tokens:')} ${FormattedString.code(formatNum(dayData.totalTokens))}
-💰 ${FormattedString.bold('Total Daily Cost:')} ${FormattedString.code(formatUSD(dayData.totalCost))}
+	const header = `📅 **Date:** \`${dayData.date}\`
 
-${FormattedString.bold('Breakdown by Model:')}
+📊 **Total Daily Tokens:** \`${formatNum(dayData.totalTokens)}\`
+
+💰 **Total Daily Cost:** \`${formatUSD(dayData.totalCost)}\`
+
+
+**Breakdown by Model:**
 `
 
 	if (dayData.breakdown.length === 0) {
-		return fmt`${header}${FormattedString.italic('No active usage recorded for this day.')}`
+		return `${header}\n_No active usage recorded for this day._`
 	}
 
 	// Find max length for usageType to align columns
@@ -54,18 +59,22 @@ ${FormattedString.bold('Breakdown by Model:')}
 		'Model'.length,
 	)
 
-	const tableHeader = `| ${'Model'.padEnd(maxUsageTypeLen)} | ${'Tokens'.padStart(10)} | ${'Cost'.padStart(10)} |`
-	const separator = `| ${'-'.repeat(maxUsageTypeLen)} | ${'-'.repeat(10)} | ${'-'.repeat(10)} |`
+	const tbl = `| Header 1 | Header 2 |
+|:---------|:--------:|
+| left     | center   |`
+
+	const tableHeader = `| Model | Tokens | Cost |`
+	const separator = `|:${'-'.repeat(maxUsageTypeLen)}|:${'-'.repeat(10)}:|:${'-'.repeat(10)}:|`
 
 	const rows = dayData.breakdown.map((item) => {
-		const tokens = formatNum(item.tokenCount).padStart(10)
-		const cost = formatUSD(item.cost).padStart(10)
-		return `| ${item.usageType.padEnd(maxUsageTypeLen)} | ${tokens} | ${cost} |`
+		const tokens = formatNum(item.tokenCount)
+		const cost = formatUSD(item.cost)
+		return `| ${item.usageType} | ${tokens} | ${cost} |`
 	})
 
 	const table = [tableHeader, separator, ...rows].join('\n')
 
-	return fmt`${header}${FormattedString.pre(table)}`
+	return `${header}\n${table}`
 }
 
 export const modelUsages = async (ctx: Context) => {
@@ -73,9 +82,9 @@ export const modelUsages = async (ctx: Context) => {
 	if (!usage) {
 		return ctx.reply('No usage data found for today.')
 	}
-	const message = fmt`Model Usages:
-${formatTokenUsageRaw(usage)}`
-	return ctx.reply(message.text, {
-		entities: message.entities,
+	return ctx.replyWithRichMessage({
+		markdown: `Model Usages:
+		
+${formatTokenUsageRaw(usage)}`,
 	})
 }
