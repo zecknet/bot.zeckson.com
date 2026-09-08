@@ -7,7 +7,7 @@ import store from './filters/store.ts'
 import aws from '../aws/routes/aws.ts'
 import bots from './routes/bots.ts'
 import help from './routes/help.ts'
-import replicate from './routes/replicate.ts'
+import replicate from '../replicate/routes/replicate.ts'
 
 const registerFilters = (bot: Bot) => {
 	bot.use(log)

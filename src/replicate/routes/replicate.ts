@@ -1,6 +1,6 @@
 import { Composer, Context } from 'grammy'
 import { config } from '../../config.ts'
-import { request } from '../../replicate/request.ts'
+import { request } from '../request.ts'
 import { CommandComposer } from '../../util/commands.ts'
 
 const replicate = new Composer<Context>() as CommandComposer<Context>
