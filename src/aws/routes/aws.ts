@@ -1,6 +1,7 @@
 import { Composer, Context } from 'grammy'
 import { CommandComposer } from '../../util/commands.ts'
 import {
+	bedrockModelsHandler,
 	bedrockWeeklyCosts,
 	ec2WeeklyCosts,
 	modelUsages,
@@ -23,17 +24,23 @@ const EC2_COST = {
 	command: 'ec2_cost',
 	description: 'Get Amazon EC2 Cost (instance + others) for last 7 days',
 }
+const BEDROCK_MODELS = {
+	command: 'bedrock_models',
+	description: 'List available Bedrock models and their pricing',
+}
 aws.commands = [
 	EC2,
 	COST_BEDROCK,
 	BEDROCK_USAGE,
 	EC2_COST,
+	BEDROCK_MODELS,
 ]
 
 aws.command(EC2.command, ec2Handler)
 aws.command(COST_BEDROCK.command, bedrockWeeklyCosts)
 aws.command(BEDROCK_USAGE.command, modelUsages)
 aws.command(EC2_COST.command, ec2WeeklyCosts)
+aws.command(BEDROCK_MODELS.command, bedrockModelsHandler)
 
 aws.callbackQuery(
 	/^aws:(start|stop):(.+)$/,

@@ -1,6 +1,10 @@
 import { ResultByTime } from '@aws-sdk/client-cost-explorer'
 import { fmt, FormattedString } from '@grammyjs/parse-mode'
 import { Context } from 'grammy'
+import {
+	formatBedrockModelsList,
+	getMergedBedrockModels,
+} from '../bedrock-models.ts'
 import { DailyTokenData, getTokenUsage } from '../bedrock-usage.ts'
 import {
 	costToDay,
@@ -85,4 +89,15 @@ export const modelUsages = async (ctx: Context) => {
 		
 ${formatTokenUsageRaw(usage)}`,
 	})
+}
+
+export const bedrockModelsHandler = async (ctx: Context) => {
+	try {
+		const models = await getMergedBedrockModels()
+		const formatted = formatBedrockModelsList(models)
+		return ctx.replyWithRichMessage({ markdown: formatted })
+	} catch (error) {
+		console.error('Error fetching Bedrock models:', error)
+		return ctx.reply('Failed to fetch Bedrock models and pricing.')
+	}
 }
