@@ -87,7 +87,7 @@ Update `deno.json` to include the necessary AWS SDK clients.
 - Add `npm:@aws-sdk/client-pricing@3.1127.0` to `imports`.
 - Ensure versions match existing AWS SDK packages in the project.
 
-### * Step 2: Implement Bedrock model and price fetching logic
+### ✓ Step 2: Implement Bedrock model and price fetching logic
 Implement the logic for fetching and merging models and prices in a new file.
 
 - Create `src/aws/bedrock-models.ts`.
@@ -96,7 +96,7 @@ Implement the logic for fetching and merging models and prices in a new file.
 - Implement a helper to merge models with their respective input/output prices and modalities.
 - Implement `formatBedrockModelsList()` to group models by provider, format the price per 1M tokens, and append ability emojis (🖼️, 🎥) based on `outputModalities`.
 
-###   Step 3: Add bot command and register routes
+### ✓ Step 3: Add bot command and register routes
 Integrate the new feature into the bot's AWS routes.
 
 - Update `src/aws/routes/cost-handler.ts` to add `bedrockModelsHandler`.
