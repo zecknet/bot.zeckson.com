@@ -1,4 +1,3 @@
-import { BedrockClient, ListFoundationModelsCommand, ModelModality } from '@aws-sdk/client-bedrock'
 import { GetProductsCommand, PricingClient } from '@aws-sdk/client-pricing'
 import { config } from "../config.ts"
 import { getConfig } from './aws.config.ts'
@@ -9,27 +8,13 @@ export interface BedrockModel {
     providerName: string
     inputPrice?: number
     outputPrice?: number
-    modalities: ModelModality[]
+    modalities?: string[]
 }
 
-export async function listActiveModels(): Promise<BedrockModel[]> {
-    const client = new BedrockClient(getConfig())
-    const response = await client.send(new ListFoundationModelsCommand({}))
-
-    return (response.modelSummaries || [])
-        .filter((m) => m.modelId)
-        .map((m) => ({
-            modelId: `${m.providerName}-${m.modelName}`.toLowerCase(),
-            modelName: m.modelName || m.modelId!,
-            providerName: m.providerName || 'Unknown',
-            modalities: m.outputModalities || [],
-        }))
-}
-
-export async function fetchOnDemandPrices(): Promise<Map<string, { input?: number; output?: number }>> {
+export async function fetchOnDemandPrices(): Promise<Map<string, BedrockModel>> {
     // Pricing API is only available in us-east-1
     const client = new PricingClient(getConfig({ region: 'us-east-1' }))
-    const prices = new Map<string, { input?: number; output?: number }>()
+    const prices = new Map<string, BedrockModel>()
 
     let nextToken: string | undefined
     do {
@@ -63,7 +48,7 @@ export async function fetchOnDemandPrices(): Promise<Map<string, { input?: numbe
             let current = prices.get(modelId) || {
                 modelName,
                 providerName,
-            }
+            } as BedrockModel
             const type = attributes.usagetype.toLowerCase()
             if (type.includes('input')) {
                 current.inputPrice = pricePerUnit
@@ -111,16 +96,7 @@ export function formatBedrockModelsList(models: BedrockModel[]): string {
 }
 
 export async function getMergedBedrockModels(): Promise<BedrockModel[]> {
-    const [models, prices] = await Promise.all([listActiveModels(), fetchOnDemandPrices()])
+    const prices = await fetchOnDemandPrices()
 
-    return prices.values()
-
-    return models.map((m) => {
-        const price = prices.get(m.modelId)
-        return {
-            ...m,
-            inputPrice: price?.inputPrice,
-            outputPrice: price?.outputPrice,
-        }
-    })
+    return prices.values().toArray()
 }

@@ -16,7 +16,6 @@
     "@grammyjs/parse-mode": "npm:@grammyjs/parse-mode@2.3.0",
     "@aws-sdk/client-ec2": "npm:@aws-sdk/client-ec2@3.1127.0",
     "@aws-sdk/client-cost-explorer": "npm:@aws-sdk/client-cost-explorer@3.1127.0",
-    "@aws-sdk/client-bedrock": "npm:@aws-sdk/client-bedrock@3.1127.0",
     "@aws-sdk/client-pricing": "npm:@aws-sdk/client-pricing@3.1127.0"
   },
   "vendor": true,

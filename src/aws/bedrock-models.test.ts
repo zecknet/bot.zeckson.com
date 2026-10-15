@@ -1,8 +1,7 @@
-import { BedrockClient, ListFoundationModelsCommand } from '@aws-sdk/client-bedrock'
 import { GetProductsCommand, PricingClient } from '@aws-sdk/client-pricing'
 import { assertEquals } from '@std/assert'
 import { stub } from '@std/testing/mock'
-import { formatBedrockModelsList, getMergedBedrockModels } from './bedrock-models.ts'
+import { BedrockModel, formatBedrockModelsList, getMergedBedrockModels } from './bedrock-models.ts'
 import { initConfig } from '../config.ts'
 
 // Mock config for testing
@@ -15,28 +14,6 @@ initConfig({
 })
 
 Deno.test('getMergedBedrockModels merges models and prices correctly', async () => {
-	const bedrockStub = stub(BedrockClient.prototype, 'send', (command) => {
-		if (command instanceof ListFoundationModelsCommand) {
-			return Promise.resolve({
-				modelSummaries: [
-					{
-						modelId: 'anthropic.claude-3-sonnet',
-						modelName: 'Claude 3 Sonnet',
-						providerName: 'Anthropic',
-						outputModalities: ['TEXT'],
-					},
-					{
-						modelId: 'amazon.titan-image-generator-v1',
-						modelName: 'Titan Image Generator v1',
-						providerName: 'Amazon',
-						outputModalities: ['IMAGE'],
-					},
-				],
-			})
-		}
-		return Promise.reject(new Error('Unknown command'))
-	})
-
 	const pricingStub = stub(PricingClient.prototype, 'send', (command) => {
 		if (command instanceof GetProductsCommand) {
 			return Promise.resolve({
@@ -44,8 +21,9 @@ Deno.test('getMergedBedrockModels merges models and prices correctly', async () 
 					JSON.stringify({
 						product: {
 							attributes: {
-								modelId: 'anthropic.claude-3-sonnet',
-								usageType: 'USW2-Bedrock-OnDemand-Input-Token',
+								provider: 'Anthropic',
+								model: 'Claude 3 Sonnet',
+								usagetype: 'USW2-Bedrock-OnDemand-Input-Token',
 							},
 						},
 						terms: {
@@ -53,7 +31,7 @@ Deno.test('getMergedBedrockModels merges models and prices correctly', async () 
 								'some-code': {
 									priceDimensions: {
 										'dim-code': {
-											pricePerUnit: { USD: '0.000003' },
+											pricePerUnit: { USD: '0.003' },
 										},
 									},
 								},
@@ -63,8 +41,9 @@ Deno.test('getMergedBedrockModels merges models and prices correctly', async () 
 					JSON.stringify({
 						product: {
 							attributes: {
-								modelId: 'anthropic.claude-3-sonnet',
-								usageType: 'USW2-Bedrock-OnDemand-Output-Token',
+								provider: 'Anthropic',
+								model: 'Claude 3 Sonnet',
+								usagetype: 'USW2-Bedrock-OnDemand-Output-Token',
 							},
 						},
 						terms: {
@@ -72,7 +51,7 @@ Deno.test('getMergedBedrockModels merges models and prices correctly', async () 
 								'some-code': {
 									priceDimensions: {
 										'dim-code': {
-											pricePerUnit: { USD: '0.000015' },
+											pricePerUnit: { USD: '0.015' },
 										},
 									},
 								},
@@ -86,47 +65,43 @@ Deno.test('getMergedBedrockModels merges models and prices correctly', async () 
 	})
 
 	try {
-		const merged = await getMergedBedrockModels()
-		assertEquals(merged.length, 2)
+		const merged = Array.from(await getMergedBedrockModels())
+		assertEquals(merged.length, 1)
 
-		const claude = merged.find((m) => m.modelId === 'anthropic.claude-3-sonnet')
-		assertEquals(claude?.inputPrice, 0.000003)
-		assertEquals(claude?.outputPrice, 0.000015)
-		assertEquals(claude?.modalities, ['TEXT'])
+		const claude = merged.find((m: any) => m.modelName === 'Claude 3 Sonnet')
+		assertEquals(claude?.inputPrice, 0.003)
+		assertEquals(claude?.outputPrice, 0.015)
+		assertEquals(claude?.providerName, 'Anthropic')
 
-		const titan = merged.find((m) => m.modelId === 'amazon.titan-image-generator-v1')
-		assertEquals(titan?.inputPrice, undefined)
-		assertEquals(titan?.outputPrice, undefined)
-		assertEquals(titan?.modalities, ['IMAGE'])
+		const titan = merged.find((m: any) => m.modelName === 'Titan Image Generator v1')
+		assertEquals(titan, undefined)
 	} finally {
-		bedrockStub.restore()
 		pricingStub.restore()
 	}
 })
 
 Deno.test('formatBedrockModelsList formats the output correctly', () => {
-	const models = [
+	const models: BedrockModel[] = [
 		{
 			modelId: 'anthropic.claude-3-sonnet',
 			modelName: 'Claude 3 Sonnet',
 			providerName: 'Anthropic',
-			inputPrice: 0.000003,
-			outputPrice: 0.000015,
+			inputPrice: 0.003,
+			outputPrice: 0.015,
 			modalities: ['TEXT'],
 		},
 		{
 			modelId: 'amazon.titan-image-generator-v1',
 			modelName: 'Titan Image Generator v1',
 			providerName: 'Amazon',
-			inputPrice: 0.0001,
-			outputPrice: 0.0002,
+			inputPrice: 0.1,
+			outputPrice: 0.2,
 			modalities: ['IMAGE'],
 		},
 	]
 
-	// @ts-ignore: Testing formatting with incomplete modality list
 	const output = formatBedrockModelsList(models)
-	
+
 	// Check title
 	assertEquals(output.includes('*Amazon Bedrock Models & Pricing (On-Demand)*'), true)
 	// Check provider grouping

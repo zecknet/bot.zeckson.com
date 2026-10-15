@@ -12,7 +12,6 @@
     "jsr:@std/path@^1.1.5": "1.1.6",
     "jsr:@std/path@^1.1.6": "1.1.6",
     "jsr:@std/testing@1.0.20": "1.0.20",
-    "npm:@aws-sdk/client-bedrock@3.1127.0": "3.1127.0",
     "npm:@aws-sdk/client-cost-explorer@3.1127.0": "3.1127.0",
     "npm:@aws-sdk/client-ec2@3.1127.0": "3.1127.0",
     "npm:@aws-sdk/client-pricing@3.1127.0": "3.1127.0",
@@ -66,20 +65,6 @@
     }
   },
   "npm": {
-    "@aws-sdk/client-bedrock@3.1127.0": {
-      "integrity": "sha512-/26o4KbAYnWiCIu2k9SAXsragT5RuYg4lJKkgLnQ0CMEwRSiloe/Smh8ZfWnGidhGoW1jX0IqPEMrB0+BC78GQ==",
-      "dependencies": [
-        "@aws-sdk/core",
-        "@aws-sdk/credential-provider-node",
-        "@aws-sdk/token-providers@3.1127.0",
-        "@aws-sdk/types",
-        "@smithy/core",
-        "@smithy/fetch-http-handler",
-        "@smithy/node-http-handler",
-        "@smithy/types",
-        "tslib"
-      ]
-    },
     "@aws-sdk/client-cost-explorer@3.1127.0": {
       "integrity": "sha512-63W3WNuW1BsERD6l3GS7WODVNeVN71Kix+bYcz/94iDDlqCQyanSLgko3cSMWsLyA7Rc6cwCl2Ul2MbtX2I/BQ==",
       "dependencies": [
@@ -215,7 +200,7 @@
       "dependencies": [
         "@aws-sdk/core",
         "@aws-sdk/nested-clients",
-        "@aws-sdk/token-providers@3.1116.0",
+        "@aws-sdk/token-providers",
         "@aws-sdk/types",
         "@smithy/core",
         "@smithy/types",
@@ -268,17 +253,6 @@
     },
     "@aws-sdk/token-providers@3.1116.0": {
       "integrity": "sha512-ygIivKqh8aHzNkucOCXHyIBgBpLPfrSI0mCqXF+vLBsPTUKqj0VSqAY0GFPe7lQl4HntjOcQ+KSyS7oUV2C54Q==",
-      "dependencies": [
-        "@aws-sdk/core",
-        "@aws-sdk/nested-clients",
-        "@aws-sdk/types",
-        "@smithy/core",
-        "@smithy/types",
-        "tslib"
-      ]
-    },
-    "@aws-sdk/token-providers@3.1127.0": {
-      "integrity": "sha512-Dv2TMWBshJ+tF6ahs2Sy5bh4Iabsd4GAQqVvE9XZmYmnoaVbpS2QKIKE/HRacc7bTtbjEEvP+laGzHvHlf1CiQ==",
       "dependencies": [
         "@aws-sdk/core",
         "@aws-sdk/nested-clients",
@@ -461,7 +435,6 @@
       "jsr:@std/assert@1.0.19",
       "jsr:@std/dotenv@0.225.8",
       "jsr:@std/testing@1.0.20",
-      "npm:@aws-sdk/client-bedrock@3.1127.0",
       "npm:@aws-sdk/client-cost-explorer@3.1127.0",
       "npm:@aws-sdk/client-ec2@3.1127.0",
       "npm:@aws-sdk/client-pricing@3.1127.0",
