@@ -65,15 +65,15 @@ Deno.test('getMergedBedrockModels merges models and prices correctly', async () 
 	})
 
 	try {
-		const merged = Array.from(await getMergedBedrockModels())
+		const merged = await getMergedBedrockModels()
 		assertEquals(merged.length, 1)
 
-		const claude = merged.find((m: any) => m.modelName === 'Claude 3 Sonnet')
+		const claude = merged.find((m) => m.modelName === 'Claude 3 Sonnet')
 		assertEquals(claude?.inputPrice, 0.003)
 		assertEquals(claude?.outputPrice, 0.015)
 		assertEquals(claude?.providerName, 'Anthropic')
 
-		const titan = merged.find((m: any) => m.modelName === 'Titan Image Generator v1')
+		const titan = merged.find((m) => m.modelName === 'Titan Image Generator v1')
 		assertEquals(titan, undefined)
 	} finally {
 		pricingStub.restore()

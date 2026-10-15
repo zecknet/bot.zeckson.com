@@ -40,12 +40,12 @@ export async function fetchOnDemandPrices(): Promise<Map<string, BedrockModel>> 
             const modelId = `${providerName}-${modelName}`.toLowerCase()
 
             const terms = priceList.terms.OnDemand
-            const term = Object.values(terms)[0] as any
-            const priceDimensions = term.priceDimensions
-            const dimension = Object.values(priceDimensions)[0] as any
-            const pricePerUnit = parseFloat(dimension.pricePerUnit.USD)
+            const term = Object.values(terms)[0] as Record<string, unknown>
+            const priceDimensions = term['priceDimensions'] as object
+            const dimension = Object.values(priceDimensions)[0] as Record<string, Record<string, string>>
+            const pricePerUnit = parseFloat(dimension['pricePerUnit']['USD'])
 
-            let current = prices.get(modelId) || {
+            const current = prices.get(modelId) || {
                 modelName,
                 providerName,
             } as BedrockModel
