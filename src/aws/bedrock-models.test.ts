@@ -1,7 +1,11 @@
 import { GetProductsCommand, PricingClient } from '@aws-sdk/client-pricing'
 import { assertEquals } from '@std/assert'
 import { stub } from '@std/testing/mock'
-import { BedrockModel, formatBedrockModelsList, getMergedBedrockModels } from './bedrock-models.ts'
+import {
+	BedrockModel,
+	formatBedrockModelsList,
+	getMergedBedrockModels,
+} from './bedrock-models.ts'
 import { initConfig } from '../config.ts'
 
 // Mock config for testing
@@ -73,7 +77,9 @@ Deno.test('getMergedBedrockModels merges models and prices correctly', async () 
 		assertEquals(claude?.outputPrice, 0.015)
 		assertEquals(claude?.providerName, 'Anthropic')
 
-		const titan = merged.find((m) => m.modelName === 'Titan Image Generator v1')
+		const titan = merged.find((m) =>
+			m.modelName === 'Titan Image Generator v1'
+		)
 		assertEquals(titan, undefined)
 	} finally {
 		pricingStub.restore()
@@ -103,14 +109,25 @@ Deno.test('formatBedrockModelsList formats the output correctly', () => {
 	const output = formatBedrockModelsList(models)
 
 	// Check title
-	assertEquals(output.includes('*Amazon Bedrock Models & Pricing (On-Demand)*'), true)
+	assertEquals(
+		output.includes('*Amazon Bedrock Models & Pricing (On-Demand)*'),
+		true,
+	)
 	// Check provider grouping
 	assertEquals(output.includes('*Anthropic*'), true)
 	assertEquals(output.includes('*Amazon*'), true)
 	// Check model formatting
-	assertEquals(output.includes('• Claude 3 Sonnet: `$3.00 (In) / $15.00 (Out)`'), true)
+	assertEquals(
+		output.includes('• Claude 3 Sonnet: `$3.00 (In) / $15.00 (Out)`'),
+		true,
+	)
 	// Check emoji for image generator
-	assertEquals(output.includes('• Titan Image Generator v1 🖼️: `$100.00 (In) / $200.00 (Out)`'), true)
+	assertEquals(
+		output.includes(
+			'• Titan Image Generator v1 🖼️: `$100.00 (In) / $200.00 (Out)`',
+		),
+		true,
+	)
 	// Check footer
 	assertEquals(output.includes('_Prices are per 1,000,000 tokens._'), true)
 })
