@@ -1,6 +1,9 @@
 # Idea project files
 .idea
 
+# Ignore .codex
+.codex
+
 # Local environment
 .env
 
